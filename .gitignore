@@ -1,14 +1,15 @@
-# Flutter & Dart
+# Flutter/Dart
+build/
 .dart_tool/
 .packages
 .pub-cache/
-build/
-
-# IDEs
+.flutter-plugins
+.flutter-plugins-dependencies
+.generated/
 .idea/
 .vscode/
 *.iml
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
