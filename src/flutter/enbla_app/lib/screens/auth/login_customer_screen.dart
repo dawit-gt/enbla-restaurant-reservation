@@ -42,10 +42,11 @@ class LoginCustomerScreen extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                // login logic later
+                Navigator.pushReplacementNamed(context, '/customer_dashboard');
               },
               child: Text('Login'),
             ),
+
 
             SizedBox(height: 10),
 

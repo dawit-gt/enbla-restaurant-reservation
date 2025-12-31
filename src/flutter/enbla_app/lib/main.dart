@@ -7,6 +7,9 @@ import 'screens/auth/login_customer_screen.dart';
 import 'screens/auth/login_manager_screen.dart';
 import 'screens/auth/register_customer_screen.dart';
 import 'screens/auth/register_manager_screen.dart';
+import 'screens/customer/customer_dashboard_screen.dart';
+import 'screens/customer/restaurant_list_screen.dart';
+
 
 void main() {
   runApp(const EnblaApp());
@@ -31,6 +34,9 @@ class EnblaApp extends StatelessWidget {
         '/login_manager': (context) => LoginManagerScreen(),
         '/register_customer': (context) => RegisterCustomerScreen(),
         '/register_manager': (context) => RegisterManagerScreen(),
+        '/customer_dashboard': (context) => CustomerDashboardScreen(),
+        '/restaurants': (context) => RestaurantListScreen(),
+
       },
     );
   }
