@@ -5,6 +5,8 @@ import 'screens/home/home_screen.dart';
 import 'screens/auth/role_selection_screen.dart';
 import 'screens/auth/login_customer_screen.dart';
 import 'screens/auth/login_manager_screen.dart';
+import 'screens/auth/register_customer_screen.dart';
+import 'screens/auth/register_manager_screen.dart';
 
 void main() {
   runApp(const EnblaApp());
@@ -27,6 +29,8 @@ class EnblaApp extends StatelessWidget {
         '/select-role': (context) => RoleSelectionScreen(),
         '/login_customer': (context) => LoginCustomerScreen(),
         '/login_manager': (context) => LoginManagerScreen(),
+        '/register_customer': (context) => RegisterCustomerScreen(),
+        '/register_manager': (context) => RegisterManagerScreen(),
       },
     );
   }
