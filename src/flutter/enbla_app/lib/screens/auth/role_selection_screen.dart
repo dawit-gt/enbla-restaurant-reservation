@@ -6,9 +6,7 @@ class RoleSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Select Role'),
-      ),
+      appBar: AppBar(title: Text('Select Role')),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -16,10 +14,7 @@ class RoleSelectionScreen extends StatelessWidget {
           children: [
             Text(
               'Continue as',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 30),
 
