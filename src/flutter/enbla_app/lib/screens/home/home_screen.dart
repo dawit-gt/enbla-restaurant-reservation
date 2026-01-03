@@ -1,57 +1,50 @@
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Enbla Restaurant'),
+        title: const Text('Enbla Restaurant'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Welcome to Enbla',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
-
-            SizedBox(height: 25),
-
-            Text(
+            const SizedBox(height: 25),
+            const Text(
               'Reserve tables easily and manage restaurants.',
               textAlign: TextAlign.center,
             ),
-
-            SizedBox(height: 40),
-
+            const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
                 // restaurant list will be added later
               },
-              child: Text('Browse Restaurants'),
+              child: const Text('Browse Restaurants'),
             ),
-
-            SizedBox(height: 15),
-
+            const SizedBox(height: 15),
             OutlinedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/select-role');
               },
-              child: Text('Login'),
+              child: const Text('Login'),
             ),
-
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/select-role');
               },
-              child: Text('Create Account'),
+              child: const Text('Create Account'),
             ),
           ],
         ),

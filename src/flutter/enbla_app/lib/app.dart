@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
-import 'routes/app_routes.dart';
+
+// Home
+import 'screens/home/home_screen.dart';
+
+// Auth
+import 'screens/auth/role_selection_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/register_screen.dart';
+
+// Customer
+import 'screens/customer/customer_dashboard_screen.dart';
+import 'screens/customer/restaurant_list_screen.dart';
 
 class EnblaApp extends StatelessWidget {
-  const EnblaApp({super.key});
+  const EnblaApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -10,11 +21,18 @@ class EnblaApp extends StatelessWidget {
       title: 'Enbla Restaurant',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.deepOrange,
-        scaffoldBackgroundColor: Colors.white,
+        primarySwatch: Colors.orange,
       ),
-      initialRoute: AppRoutes.home,
-      routes: AppRoutes.routes,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(),
+        '/select-role': (context) => const RoleSelectionScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/customer_dashboard': (context) =>
+            const CustomerDashboardScreen(),
+        '/restaurants': (context) => RestaurantListScreen(),
+      },
     );
   }
 }

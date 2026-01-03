@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 
-// Screens
+// Home
 import 'screens/home/home_screen.dart';
+
+// Auth
 import 'screens/auth/role_selection_screen.dart';
-import 'screens/auth/login_customer_screen.dart';
-import 'screens/auth/login_manager_screen.dart';
-import 'screens/auth/register_customer_screen.dart';
-import 'screens/auth/register_manager_screen.dart';
+import 'screens/auth/login_screen.dart';
+import 'screens/auth/register_screen.dart';
+
+// Customer
 import 'screens/customer/customer_dashboard_screen.dart';
 import 'screens/customer/restaurant_list_screen.dart';
 
-
-void main() {
-  runApp(const EnblaApp());
-}
-
 class EnblaApp extends StatelessWidget {
-  const EnblaApp({super.key});
+  const EnblaApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +25,18 @@ class EnblaApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => HomeScreen(),
-        '/select-role': (context) => RoleSelectionScreen(),
-        '/login_customer': (context) => LoginCustomerScreen(),
-        '/login_manager': (context) => LoginManagerScreen(),
-        '/register_customer': (context) => RegisterCustomerScreen(),
-        '/register_manager': (context) => RegisterManagerScreen(),
-        '/customer_dashboard': (context) => CustomerDashboardScreen(),
+        '/': (context) => const HomeScreen(),
+        '/select-role': (context) => const RoleSelectionScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/customer_dashboard': (context) =>
+            const CustomerDashboardScreen(),
         '/restaurants': (context) => RestaurantListScreen(),
-
       },
     );
   }
+}
+
+void main() {
+  runApp(const EnblaApp());
 }
