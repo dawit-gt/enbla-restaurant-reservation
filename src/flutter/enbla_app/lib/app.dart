@@ -13,7 +13,7 @@ import 'screens/customer/customer_dashboard_screen.dart';
 import 'screens/customer/restaurant_list_screen.dart';
 
 class EnblaApp extends StatelessWidget {
-  const EnblaApp({Key? key}) : super(key: key);
+  const EnblaApp({super.key});
 
   @override
   Widget build(BuildContext context) {

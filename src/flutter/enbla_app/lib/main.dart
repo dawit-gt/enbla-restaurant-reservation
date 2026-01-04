@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 
 // Home
 import 'screens/home/home_screen.dart';
@@ -15,7 +18,7 @@ import 'screens/customer/customer_dashboard_screen.dart';
 import 'screens/customer/restaurant_list_screen.dart';
 
 class EnblaApp extends StatelessWidget {
-  const EnblaApp({Key? key}) : super(key: key);
+  const EnblaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +44,11 @@ class EnblaApp extends StatelessWidget {
   }
 }
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const EnblaApp());
 }
+

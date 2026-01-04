@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoginManagerScreen extends StatelessWidget {
-  const LoginManagerScreen({Key? key}) : super(key: key);
+  const LoginManagerScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

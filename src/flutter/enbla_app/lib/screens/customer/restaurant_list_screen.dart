@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RestaurantListScreen extends StatelessWidget {
-  RestaurantListScreen({Key? key}) : super(key: key);
+  RestaurantListScreen({super.key});
 
   final List<String> restaurants = [
     'Blue Moon Restaurant',

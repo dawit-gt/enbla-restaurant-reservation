@@ -1,7 +1,53 @@
 import 'package:flutter/material.dart';
+import '../../services/auth_service.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _authService = AuthService();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleRegister() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final user = await _authService.registerWithEmail(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (user != null) {
+      Navigator.pop(context); // back to login
+    } else {
+      setState(() {
+        _errorMessage = 'Registration failed. Please try again.';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,42 +60,43 @@ class RegisterScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
                 labelText: 'Full Name',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 15),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
                 labelText: 'Email',
                 border: OutlineInputBorder(),
               ),
             ),
             const SizedBox(height: 15),
-            const TextField(
+            TextField(
+              controller: _passwordController,
               obscureText: true,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Password',
                 border: OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 25),
-            ElevatedButton(
-              onPressed: () {
-                // later: save user then go back to login
-                Navigator.pop(context);
-              },
-              child: const Text('Register'),
-            ),
-            const SizedBox(height: 10),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Already have an account? Login'),
-            ),
+            const SizedBox(height: 15),
+            if (_errorMessage != null)
+              Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            const SizedBox(height: 15),
+            _isLoading
+                ? const CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: _handleRegister,
+                    child: const Text('Register'),
+                  ),
           ],
         ),
       ),

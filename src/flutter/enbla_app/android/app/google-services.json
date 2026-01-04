@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "129062883500",
+    "project_id": "enbla-app",
+    "storage_bucket": "enbla-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:129062883500:android:ff6dc0df21182ceac10f09",
+        "android_client_info": {
+          "package_name": "com.example.enbla_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZI8FDqGA7SphwnWnh2EUAbCQ2YY8LPUs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
