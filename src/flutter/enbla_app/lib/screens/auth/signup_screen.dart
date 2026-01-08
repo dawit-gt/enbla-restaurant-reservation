@@ -1,31 +1,26 @@
-// lib/screens/auth/login_screen.dart
+// lib/screens/auth/signup_screen.dart
 import 'package:flutter/material.dart';
 import '../../widgets/text_input_field.dart';
 import '../../widgets/primary_button.dart';
-import '../customer/customer_home_screen.dart';
-import '../manager/manager_home_screen.dart';
-import 'signup_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  static const routeName = '/login';
+class SignupScreen extends StatefulWidget {
+  static const routeName = '/signup';
 
-  const LoginScreen({Key? key}) : super(key: key);
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  // TODO: replace with Firebase auth + real role
-  void _loginAsCustomer() {
-    Navigator.pushReplacementNamed(context, CustomerHomeScreen.routeName);
-  }
-
-  void _loginAsManager() {
-    Navigator.pushReplacementNamed(context, ManagerHomeScreen.routeName);
+  // TODO: connect to Firebase registration
+  void _handleSignup() {
+    // For now just pop back
+    Navigator.pop(context);
   }
 
   @override
@@ -39,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 40),
               const Text(
-                'Login',
+                'Signup',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -48,6 +43,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 32),
+              TextInputField(
+                controller: _nameController,
+                hintText: 'Name',
+              ),
+              const SizedBox(height: 16),
               TextInputField(
                 controller: _emailController,
                 hintText: 'Email',
@@ -60,23 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
               PrimaryButton(
-                label: 'Login as Customer',
-                onPressed: _loginAsCustomer,
-              ),
-              const SizedBox(height: 12),
-              PrimaryButton(
-                label: 'Login as Manager',
-                onPressed: _loginAsManager,
-              ),
-              const Spacer(),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, SignupScreen.routeName);
-                },
-                child: const Text(
-                  'Create account',
-                  style: TextStyle(color: Colors.white),
-                ),
+                label: 'Create account',
+                onPressed: _handleSignup,
               ),
             ],
           ),
