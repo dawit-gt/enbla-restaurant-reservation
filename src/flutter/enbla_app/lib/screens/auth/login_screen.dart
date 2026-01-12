@@ -33,42 +33,72 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 16),
-              TextInputField(controller: _emailController, hintText: 'Email'),
-              const SizedBox(height: 16),
-              TextInputField(
-                controller: _passwordController,
-                hintText: 'Password',
-                obscure: true,
-              ),
-              const SizedBox(height: 24),
-              PrimaryButton(
-                label: 'Login as Customer',
-                onPressed: _loginAsCustomer,
-              ),
-              const SizedBox(height: 12),
-              PrimaryButton(
-                label: 'Login as Manager',
-                onPressed: _loginAsManager,
-              ),
-              const Spacer(),
-              Center(
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, SignupScreen.routeName);
-                  },
-                  child: const Text(
-                    'Create account',
-                    style: TextStyle(color: Colors.white),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 8),
+                  Image.asset(
+                    'assets/images/enbla_logo.png',
+                    width: 88,
+                    height: 88,
+                    errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.restaurant,
+                      size: 64,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Welcome to Enbla\nአብረን እንብላ',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextInputField(
+                    controller: _emailController,
+                    hintText: 'Email',
+                  ),
+                  const SizedBox(height: 16),
+                  TextInputField(
+                    controller: _passwordController,
+                    hintText: 'Password',
+                    obscure: true,
+                  ),
+                  const SizedBox(height: 24),
+                  PrimaryButton(
+                    label: 'Login as Customer',
+                    onPressed: _loginAsCustomer,
+                  ),
+                  const SizedBox(height: 12),
+                  PrimaryButton(
+                    label: 'Login as Manager',
+                    onPressed: _loginAsManager,
+                  ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, SignupScreen.routeName);
+                      },
+                      child: const Text(
+                        'Create account',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

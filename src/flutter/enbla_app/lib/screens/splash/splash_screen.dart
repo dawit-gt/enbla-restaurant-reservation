@@ -17,14 +17,21 @@ class SplashScreen extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: const [
-            Icon(Icons.restaurant, size: 80, color: Colors.white),
-            SizedBox(height: 16),
-            Text(
-              'Enbla',
+          children: [
+            Image.asset(
+              'assets/images/enbla_logo.png',
+              width: 140,
+              height: 140,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.restaurant, size: 80, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Welcome to Enbla\nአብረን እንብላ',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 28,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
