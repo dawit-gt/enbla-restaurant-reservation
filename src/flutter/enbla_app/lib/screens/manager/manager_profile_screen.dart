@@ -59,6 +59,8 @@ class ManagerProfileScreen extends StatelessWidget {
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          const Text('Are you sure you want to log out?'),
+                          const SizedBox(height: 12),
                           Center(
                             child: ElevatedButton(
                               onPressed: () => Navigator.of(context).pop(true),
@@ -77,6 +79,7 @@ class ManagerProfileScreen extends StatelessWidget {
                     ),
                   );
                   if (shouldLogout == true) {
+                    if (!context.mounted) return;
                     Navigator.pushNamedAndRemoveUntil(
                       context,
                       LoginScreen.routeName,

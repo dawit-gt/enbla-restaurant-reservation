@@ -23,18 +23,13 @@ class _ManagerAddRestaurantScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Restaurant'),
-      ),
+      appBar: AppBar(title: const Text('Add Restaurant')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              TextInputField(
-                controller: _nameController,
-                hintText: 'Name',
-              ),
+              TextInputField(controller: _nameController, hintText: 'Name'),
               const SizedBox(height: 12),
               TextInputField(
                 controller: _locationController,
@@ -44,6 +39,7 @@ class _ManagerAddRestaurantScreenState
               TextInputField(
                 controller: _descriptionController,
                 hintText: 'Description',
+                maxLines: 4,
               ),
               const SizedBox(height: 12),
               TextInputField(

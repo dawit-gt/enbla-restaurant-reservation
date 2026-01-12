@@ -17,6 +17,7 @@ import 'screens/manager/manager_edit_restaurant_screen.dart';
 import 'screens/manager/manager_add_restaurant_screen.dart';
 import 'screens/manager/manager_profile_screen.dart';
 import 'screens/manager/manager_reservations_screen.dart';
+import 'screens/manager/manager_reservation_detail_screen.dart';
 
 // Customer
 import 'screens/customer/customer_home_screen.dart';
@@ -24,6 +25,7 @@ import 'screens/customer/customer_restaurant_detail_screen.dart';
 import 'screens/customer/customer_reservation_form_screen.dart';
 import 'screens/customer/customer_profile_screen.dart';
 import 'screens/customer/customer_reservations_screen.dart';
+import 'screens/customer/customer_reservation_detail_screen.dart';
 
 void main() {
   runApp(const EnblaApp());
@@ -63,6 +65,11 @@ class EnblaApp extends StatelessWidget {
         CustomerProfileScreen.routeName: (_) => const CustomerProfileScreen(),
         CustomerReservationsScreen.routeName: (_) =>
             const CustomerReservationsScreen(),
+        // Reservation detail screen
+        '/customer/reservation/detail': (_) =>
+            const CustomerReservationDetailScreen(),
+        '/manager/reservation/detail': (_) =>
+            const ManagerReservationDetailScreen(),
       },
     );
   }

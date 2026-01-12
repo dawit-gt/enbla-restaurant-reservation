@@ -28,11 +28,6 @@ class _SignupScreenState extends State<SignupScreen> {
     Navigator.pop(context);
   }
 
-  void _handleSignup() {
-    // kept for backward compatibility
-    Navigator.pop(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
