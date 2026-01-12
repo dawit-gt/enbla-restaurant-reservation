@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class CustomerReservationsScreen extends StatelessWidget {
   static const routeName = '/customer/reservations';
 
-  const CustomerReservationsScreen({Key? key}) : super(key: key);
+  const CustomerReservationsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

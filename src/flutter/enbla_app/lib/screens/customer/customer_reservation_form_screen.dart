@@ -6,7 +6,7 @@ import '../../widgets/primary_button.dart';
 class CustomerReservationFormScreen extends StatefulWidget {
   static const routeName = '/customer/reservation/form';
 
-  const CustomerReservationFormScreen({Key? key}) : super(key: key);
+  const CustomerReservationFormScreen({super.key});
 
   @override
   State<CustomerReservationFormScreen> createState() =>

@@ -6,17 +6,14 @@ import 'manager_edit_restaurant_screen.dart';
 class ManagerRestaurantDetailScreen extends StatelessWidget {
   static const routeName = '/manager/restaurant/detail';
 
-  const ManagerRestaurantDetailScreen({Key? key}) : super(key: key);
+  const ManagerRestaurantDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final restaurant =
-        ModalRoute.of(context)!.settings.arguments as Restaurant;
+    final restaurant = ModalRoute.of(context)!.settings.arguments as Restaurant;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(restaurant.name),
-      ),
+      appBar: AppBar(title: Text(restaurant.name)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -59,15 +56,17 @@ class ManagerRestaurantDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  ManagerEditRestaurantScreen.routeName,
-                  arguments: restaurant,
-                );
-              },
-              child: const Text('Edit Restaurant'),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    ManagerEditRestaurantScreen.routeName,
+                    arguments: restaurant,
+                  );
+                },
+                child: const Text('Edit Restaurant'),
+              ),
             ),
           ],
         ),

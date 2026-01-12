@@ -10,7 +10,7 @@ import 'manager_reservations_screen.dart';
 class ManagerHomeScreen extends StatelessWidget {
   static const routeName = '/manager/home';
 
-  const ManagerHomeScreen({Key? key}) : super(key: key);
+  const ManagerHomeScreen({super.key});
 
   List<Restaurant> _dummyRestaurants() {
     return [
@@ -56,8 +56,7 @@ class ManagerHomeScreen extends StatelessWidget {
         ],
         onTap: (index) {
           if (index == 1) {
-            Navigator.pushNamed(
-                context, ManagerReservationsScreen.routeName);
+            Navigator.pushNamed(context, ManagerReservationsScreen.routeName);
           }
         },
       ),
@@ -94,13 +93,17 @@ class ManagerHomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pushNamed(
-                    context, ManagerAddRestaurantScreen.routeName);
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Add Restaurant'),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    ManagerAddRestaurantScreen.routeName,
+                  );
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Add Restaurant'),
+              ),
             ),
           ],
         ),

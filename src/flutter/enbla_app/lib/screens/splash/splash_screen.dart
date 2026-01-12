@@ -5,7 +5,7 @@ import '../auth/login_screen.dart';
 class SplashScreen extends StatelessWidget {
   static const routeName = '/';
 
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

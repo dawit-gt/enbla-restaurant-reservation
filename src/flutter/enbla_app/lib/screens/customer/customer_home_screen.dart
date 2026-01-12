@@ -9,7 +9,7 @@ import 'customer_reservations_screen.dart';
 class CustomerHomeScreen extends StatelessWidget {
   static const routeName = '/customer/home';
 
-  const CustomerHomeScreen({Key? key}) : super(key: key);
+  const CustomerHomeScreen({super.key});
 
   List<Restaurant> _dummyRestaurants() {
     return [

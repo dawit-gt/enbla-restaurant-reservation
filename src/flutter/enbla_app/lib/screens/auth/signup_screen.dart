@@ -6,7 +6,7 @@ import '../../widgets/primary_button.dart';
 class SignupScreen extends StatefulWidget {
   static const routeName = '/signup';
 
-  const SignupScreen({Key? key}) : super(key: key);
+  const SignupScreen({super.key});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -18,40 +18,35 @@ class _SignupScreenState extends State<SignupScreen> {
   final _passwordController = TextEditingController();
 
   // TODO: connect to Firebase registration
+  void _signupAsCustomer() {
+    // TODO: register user as customer
+    Navigator.pop(context);
+  }
+
+  void _signupAsManager() {
+    // TODO: register user as manager
+    Navigator.pop(context);
+  }
+
   void _handleSignup() {
-    // For now just pop back
+    // kept for backward compatibility
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Signup')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
-              const Text(
-                'Signup',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 32),
-              TextInputField(
-                controller: _nameController,
-                hintText: 'Name',
-              ),
               const SizedBox(height: 16),
-              TextInputField(
-                controller: _emailController,
-                hintText: 'Email',
-              ),
+              TextInputField(controller: _nameController, hintText: 'Name'),
+              const SizedBox(height: 16),
+              TextInputField(controller: _emailController, hintText: 'Email'),
               const SizedBox(height: 16),
               TextInputField(
                 controller: _passwordController,
@@ -60,8 +55,13 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 24),
               PrimaryButton(
-                label: 'Create account',
-                onPressed: _handleSignup,
+                label: 'Signup as Customer',
+                onPressed: _signupAsCustomer,
+              ),
+              const SizedBox(height: 12),
+              PrimaryButton(
+                label: 'Signup as Manager',
+                onPressed: _signupAsManager,
               ),
             ],
           ),

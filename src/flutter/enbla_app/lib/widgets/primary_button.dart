@@ -6,16 +6,16 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const PrimaryButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      child: Text(label),
+    // Center the button and size it to its child (text).
+    return Center(
+      child: ElevatedButton(onPressed: onPressed, child: Text(label)),
     );
   }
 }

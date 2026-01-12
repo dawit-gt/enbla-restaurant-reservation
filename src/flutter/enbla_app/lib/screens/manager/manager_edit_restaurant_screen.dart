@@ -7,7 +7,7 @@ import '../../widgets/primary_button.dart';
 class ManagerEditRestaurantScreen extends StatefulWidget {
   static const routeName = '/manager/restaurant/edit';
 
-  const ManagerEditRestaurantScreen({Key? key}) : super(key: key);
+  const ManagerEditRestaurantScreen({super.key});
 
   @override
   State<ManagerEditRestaurantScreen> createState() =>

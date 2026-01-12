@@ -9,7 +9,7 @@ import 'signup_screen.dart';
 class LoginScreen extends StatefulWidget {
   static const routeName = '/login';
 
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -31,27 +31,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('Login')),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
-              const Text(
-                'Login',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 32),
-              TextInputField(
-                controller: _emailController,
-                hintText: 'Email',
-              ),
+              const SizedBox(height: 16),
+              TextInputField(controller: _emailController, hintText: 'Email'),
               const SizedBox(height: 16),
               TextInputField(
                 controller: _passwordController,
@@ -69,13 +57,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: _loginAsManager,
               ),
               const Spacer(),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, SignupScreen.routeName);
-                },
-                child: const Text(
-                  'Create account',
-                  style: TextStyle(color: Colors.white),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, SignupScreen.routeName);
+                  },
+                  child: const Text(
+                    'Create account',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],

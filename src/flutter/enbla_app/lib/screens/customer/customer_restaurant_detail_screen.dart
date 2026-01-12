@@ -6,17 +6,14 @@ import 'customer_reservation_form_screen.dart';
 class CustomerRestaurantDetailScreen extends StatelessWidget {
   static const routeName = '/customer/restaurant/detail';
 
-  const CustomerRestaurantDetailScreen({Key? key}) : super(key: key);
+  const CustomerRestaurantDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final restaurant =
-        ModalRoute.of(context)!.settings.arguments as Restaurant;
+    final restaurant = ModalRoute.of(context)!.settings.arguments as Restaurant;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(restaurant.name),
-      ),
+      appBar: AppBar(title: Text(restaurant.name)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -59,15 +56,17 @@ class CustomerRestaurantDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  CustomerReservationFormScreen.routeName,
-                  arguments: restaurant,
-                );
-              },
-              child: const Text('Make Reservation'),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    CustomerReservationFormScreen.routeName,
+                    arguments: restaurant,
+                  );
+                },
+                child: const Text('Make Reservation'),
+              ),
             ),
           ],
         ),

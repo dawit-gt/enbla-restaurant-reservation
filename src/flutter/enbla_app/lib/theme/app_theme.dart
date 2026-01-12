@@ -14,9 +14,7 @@ ThemeData buildAppTheme() {
       elevation: 0,
       centerTitle: true,
     ),
-    textTheme: const TextTheme(
-      bodyMedium: TextStyle(color: Colors.black),
-    ),
+    textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black)),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
@@ -30,10 +28,10 @@ ThemeData buildAppTheme() {
       style: ElevatedButton.styleFrom(
         backgroundColor: beigeColor,
         foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        minimumSize: const Size(double.infinity, 48),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        // Allow buttons to size to their child text. Set minimum width to 0.
+        minimumSize: const Size(0, 48),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
     ),
   );

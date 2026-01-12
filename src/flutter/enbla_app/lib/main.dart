@@ -30,7 +30,7 @@ void main() {
 }
 
 class EnblaApp extends StatelessWidget {
-  const EnblaApp({Key? key}) : super(key: key);
+  const EnblaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
