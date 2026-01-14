@@ -61,14 +61,15 @@ class CustomerReservationsScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: const Text('My Reservations')),
-      body: Padding(
+      appBar: AppBar(title: const Text('My Reservations'), backgroundColor: const Color(0xFF72383D)),
+      body: Container(
+        color: Colors.white,
         padding: const EdgeInsets.all(16),
         child: reservations.isEmpty
             ? const Center(
                 child: Text(
                   'No reservations found',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Color(0xFF4A2E2E)),
                 ),
               )
             : ListView.builder(
@@ -76,54 +77,46 @@ class CustomerReservationsScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final res = reservations[index];
                   final restaurant = restaurantMap[res.restaurantId];
-                  return Card(
-                    color: const Color(0xFF72383D),
-                    shape: RoundedRectangleBorder(
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE5D3C5),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/customer/reservation/detail',
-                          arguments: {
-                            'reservation': res,
-                            'restaurant': restaurant,
-                          },
-                        );
-                      },
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          restaurant?.imageUrl ?? '',
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          restaurant?.name ?? 'Restaurant',
+                          style: const TextStyle(
+                              color: Color(0xFF4A2E2E), fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      title: Text(
-                        restaurant?.name ?? 'Restaurant',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            _formatDateTime(res.dateTime),
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Guests: ${res.guests}',
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                        ],
-                      ),
-                      trailing: Text(
-                        res.status,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                        const SizedBox(height: 8),
+                        Text(
+                          'Date: ${_formatDateTime(res.dateTime)}',
+                          style: const TextStyle(color: Color(0xFF4A2E2E)),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Guests: ${res.guests}',
+                          style: const TextStyle(color: Color(0xFF4A2E2E)),
+                        ),
+                        const SizedBox(height: 12),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: PrimaryButton(label: 'View', onPressed: () {
+                            Navigator.pushNamed(
+                              context,
+                              '/customer/reservation/detail',
+                              arguments: {
+                                'reservation': res,
+                                'restaurant': restaurant,
+                              },
+                            );
+                          }),
+                        )
+                      ],
                     ),
                   );
                 },

@@ -14,47 +14,43 @@ class RestaurantCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+    return Container(
+      height: 92,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE5D3C5),
+        borderRadius: BorderRadius.circular(18),
+      ),
       child: InkWell(
         onTap: onTap,
-        child: Row(
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: NetworkImage(restaurant.imageUrl),
-                  fit: BoxFit.cover,
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundImage: NetworkImage(restaurant.imageUrl),
+                backgroundColor: const Color(0xFFCCCCCC),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  restaurant.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Color(0xFF4A2E2E),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      restaurant.name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      restaurant.location,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: const Color(0xFF7B3738),
+                size: 20,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

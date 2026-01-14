@@ -1,5 +1,10 @@
-Please add the provided app icon image here with the filename `enbla_logo.png`.
+Please add the provided app image files here with the filenames:
 
-Path to use: `assets/images/enbla_logo.png`
+- `enbla_logo.png` (app logo used in splash, login and signup screens)
+- `splash_bg.png` (splash background image used by the splash screen)
 
-This image is referenced by the splash, login and signup screens. After placing the file, run `flutter pub get` then restart the app.
+Paths to use:
+- `assets/images/enbla_logo.png`
+- `assets/images/splash_bg.png`
+
+After placing the files, run `flutter pub get` then restart the app.

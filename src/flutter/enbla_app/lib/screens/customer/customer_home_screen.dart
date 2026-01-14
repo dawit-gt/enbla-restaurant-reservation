@@ -4,7 +4,6 @@ import '../../models/restaurant.dart';
 import '../../widgets/restaurant_card.dart';
 import 'customer_restaurant_detail_screen.dart';
 import 'customer_profile_screen.dart';
-import 'customer_reservations_screen.dart';
 
 class CustomerHomeScreen extends StatelessWidget {
   static const routeName = '/customer/home';
@@ -40,7 +39,8 @@ class CustomerHomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Enbla'),
+        title: const Text('Enbla', style: TextStyle(color: Color(0xFFD9C3A5))),
+        backgroundColor: const Color(0xFF72383D),
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -51,6 +51,9 @@ class CustomerHomeScreen extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFFE5D3C5),
+        selectedItemColor: const Color(0xFF7B3738),
+        unselectedItemColor: const Color(0xFF7B3738),
         currentIndex: 0,
         items: const [
           BottomNavigationBarItem(
@@ -58,31 +61,31 @@ class CustomerHomeScreen extends StatelessWidget {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bookmark),
-            label: 'My Reservations',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
         onTap: (index) {
           if (index == 1) {
-            Navigator.pushNamed(
-                context, CustomerReservationsScreen.routeName);
+            Navigator.pushNamed(context, CustomerProfileScreen.routeName);
           }
         },
       ),
-      body: Padding(
+      body: Container(
+        color: Colors.white,
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Restaurants',
+              'My Restaurants',
               style: TextStyle(
-                color: Colors.white,
-                fontSize: 22,
+                color: Color(0xFF4A2E2E),
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Expanded(
               child: ListView.builder(
                 itemCount: restaurants.length,
@@ -101,6 +104,21 @@ class CustomerHomeScreen extends StatelessWidget {
                 },
               ),
             ),
+            const SizedBox(height: 12),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.add),
+                label: const Text('Add Restaurants'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF7B3738),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
           ],
         ),
       ),

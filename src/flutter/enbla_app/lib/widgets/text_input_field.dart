@@ -21,7 +21,21 @@ class TextInputField extends StatelessWidget {
       controller: controller,
       obscureText: obscure,
       maxLines: maxLines,
-      decoration: InputDecoration(hintText: hintText),
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(
+        hintText: hintText,
+        filled: true,
+        fillColor: const Color.fromRGBO(217, 195, 165, 0.12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(24),
+          borderSide: BorderSide.none,
+        ),
+        hintStyle: const TextStyle(color: Color(0xFF4A2E2E)),
+      ),
     );
   }
 }
