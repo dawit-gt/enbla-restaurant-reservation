@@ -1,192 +1,268 @@
-// lib/screens/manager/manager_restaurant_detail_screen.dart
 import 'package:flutter/material.dart';
-import '../../models/restaurant.dart';
-import 'manager_edit_restaurant_screen.dart';
+import '../../routes/app_routes.dart';
 
 class ManagerRestaurantDetailScreen extends StatelessWidget {
-  static const routeName = '/manager/restaurant/detail';
-
   const ManagerRestaurantDetailScreen({super.key});
 
-  Widget _buildBulletRow(String text) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 8,
-          height: 8,
-          margin: const EdgeInsets.only(top: 6, right: 12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF7B3738),
-            shape: BoxShape.circle,
-          ),
-        ),
-        Expanded(
-          child: Text(text, style: const TextStyle(color: Color(0xFF4A2E2E))),
-        ),
-      ],
-    );
+  void _onBack(BuildContext context) {
+    Navigator.pop(context);
+  }
+
+  void _onUpdate(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.managerEditRestaurant);
   }
 
   @override
   Widget build(BuildContext context) {
-    final restaurant = ModalRoute.of(context)!.settings.arguments as Restaurant;
+    const headerColor = Color(0xFF6F3738);
+    const bulletColor = Color(0xFF7F3335);
+
+    // Temporary static data; later pass a Restaurant model via arguments.
+    const restaurantName = 'Abebe Restaurant';
+    const location = 'Lafto, Addis Ababa';
+    const description =
+        'A cozy modern restaurant serving freshly prepared local and international dishes. '
+        'Known for its warm atmosphere and friendly service, perfect for casual dining or small celebrations.';
+    const managerName = 'Abebe Tola';
+    const imageUrl = 'https://via.placeholder.com/400x220';
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF72383D),
-        elevation: 0,
-        titleSpacing: 0,
-        title: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                margin: const EdgeInsets.only(left: 12),
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF7B3738),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.35),
-                      blurRadius: 8,
-                      offset: const Offset(0, 6),
+      body: Column(
+        children: [
+          // Header
+          Container(
+            color: headerColor,
+            padding:
+                const EdgeInsets.only(top: 40, left: 12, right: 20, bottom: 12),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => _onBack(context),
+                ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        'Abebe',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        'Restaurant',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    const Text(
+                      'Hello, Manager Get',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        'G',
+                        style: TextStyle(
+                          color: headerColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                child: const Icon(Icons.arrow_back, color: Color(0xFFD9C3A5)),
-              ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                restaurant.name,
-                style: const TextStyle(
-                  color: Color(0xFFD9C3A5),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+          ),
+
+          // Image
+          SizedBox(
+            height: 190,
+            width: double.infinity,
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
             ),
-            const SizedBox(width: 8),
-            const Padding(
-              padding: EdgeInsets.only(right: 12.0),
-              child: Row(
+          ),
+
+          // Details
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Hello, Manager Get',
-                    style: TextStyle(color: Color(0xFFD9C3A5)),
+                  _BulletTextRow(
+                    bulletColor: bulletColor,
+                    label: 'Name',
+                    value: restaurantName,
+                    isBoldValue: true,
                   ),
-                  SizedBox(width: 8),
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      'G',
-                      style: TextStyle(
-                        color: Color(0xFF4A2E2E),
-                        fontWeight: FontWeight.bold,
+                  const SizedBox(height: 12),
+                  _BulletTextRow(
+                    bulletColor: bulletColor,
+                    label: 'Location',
+                    value: location,
+                    isBoldValue: true,
+                  ),
+                  const SizedBox(height: 12),
+                  _BulletParagraph(
+                    bulletColor: bulletColor,
+                    text: description,
+                  ),
+                  const SizedBox(height: 12),
+                  _BulletTextRow(
+                    bulletColor: bulletColor,
+                    label: 'Manger',
+                    value: managerName,
+                    isBoldValue: true,
+                  ),
+                  const SizedBox(height: 32),
+
+                  // Update button
+                  Center(
+                    child: SizedBox(
+                      width: 180,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: headerColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 6,
+                          shadowColor: Colors.black45,
+                        ),
+                        onPressed: () => _onUpdate(context),
+                        child: const Text(
+                          'Update',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // image banner with a subtle border
-            Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.blueAccent, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 6,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.network(
-                  restaurant.imageUrl,
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
+    );
+  }
+}
 
-            const SizedBox(height: 8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildBulletRow('Name: ${restaurant.name}'),
-                  const SizedBox(height: 12),
-                  _buildBulletRow('Location: ${restaurant.location}'),
-                  const SizedBox(height: 12),
-                  _buildBulletRow(restaurant.description),
-                  const SizedBox(height: 12),
-                  _buildBulletRow('Manager: ${restaurant.managerName}'),
-                ],
-              ),
-            ),
+class _BulletTextRow extends StatelessWidget {
+  final Color bulletColor;
+  final String label;
+  final String value;
+  final bool isBoldValue;
 
-            const SizedBox(height: 24),
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.35),
-                      blurRadius: 12,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7B3738),
-                    foregroundColor: const Color(0xFFD9C3A5),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 30,
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      ManagerEditRestaurantScreen.routeName,
-                      arguments: restaurant,
-                    );
-                  },
-                  child: const Text('Update'),
-                ),
-              ),
-            ),
+  const _BulletTextRow({
+    required this.bulletColor,
+    required this.label,
+    required this.value,
+    this.isBoldValue = false,
+  });
 
-            const SizedBox(height: 32),
-          ],
+  @override
+  Widget build(BuildContext context) {
+    final valueStyle = TextStyle(
+      fontWeight: isBoldValue ? FontWeight.w700 : FontWeight.w400,
+    );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _BulletDot(color: bulletColor),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              text: '$label: ',
+              style: const TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+              ),
+              children: [
+                TextSpan(
+                  text: value,
+                  style: valueStyle,
+                ),
+              ],
+            ),
+          ),
         ),
+      ],
+    );
+  }
+}
+
+class _BulletParagraph extends StatelessWidget {
+  final Color bulletColor;
+  final String text;
+
+  const _BulletParagraph({
+    required this.bulletColor,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _BulletDot(color: bulletColor),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _BulletDot extends StatelessWidget {
+  final Color color;
+
+  const _BulletDot({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 8,
+      height: 8,
+      margin: const EdgeInsets.only(top: 5),
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
       ),
     );
   }

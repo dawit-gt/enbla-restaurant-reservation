@@ -1,38 +1,60 @@
-// lib/theme/app_theme.dart
 import 'package:flutter/material.dart';
 
-ThemeData buildAppTheme() {
-  const primaryColor = Color(0xFF72383D); // main maroon from your design
-  const beigeColor = Color(0xFFE5D3C5);
+class AppTheme {
+  static const Color primaryMaroon = Color(0xFF6F3738);
+  static const Color accentMaroon = Color(0xFF7F3335);
+  static const Color lightCard = Color(0xFFE3D3C3);
+  static const Color creamText = Color(0xFFE9D9D0);
 
-  return ThemeData(
-    primaryColor: primaryColor,
-    scaffoldBackgroundColor: primaryColor,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: primaryColor,
-      foregroundColor: Colors.white,
-      elevation: 0,
-      centerTitle: true,
-    ),
-    textTheme: const TextTheme(bodyMedium: TextStyle(color: Colors.black)),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: false,
+      primaryColor: primaryMaroon,
+      scaffoldBackgroundColor: Colors.white,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primaryMaroon,
+        primary: primaryMaroon,
+        secondary: accentMaroon,
+        background: Colors.white,
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: beigeColor,
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        // Allow buttons to size to their child text. Set minimum width to 0.
-        minimumSize: const Size(0, 48),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: primaryMaroon,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
-    ),
-  );
+      textTheme: const TextTheme(
+        titleLarge: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: Colors.black,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          color: Colors.black87,
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: accentMaroon,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          textStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: lightCard,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      ),
+    );
+  }
 }

@@ -1,56 +1,80 @@
-// lib/widgets/restaurant_card.dart
 import 'package:flutter/material.dart';
-import '../models/restaurant.dart';
+import '../theme/app_theme.dart';
 
 class RestaurantCard extends StatelessWidget {
-  final Restaurant restaurant;
+  final String title;
+  final String description;
+  final String imageUrl;
   final VoidCallback onTap;
 
   const RestaurantCard({
     super.key,
-    required this.restaurant,
+    required this.title,
+    required this.description,
+    required this.imageUrl,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 92,
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE5D3C5),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 32,
-                backgroundImage: NetworkImage(restaurant.imageUrl),
-                backgroundColor: const Color(0xFFCCCCCC),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppTheme.lightCard,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(18),
+                bottomLeft: Radius.circular(18),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  restaurant.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color(0xFF4A2E2E),
-                  ),
+              child: Image.network(
+                imageUrl,
+                width: 120,
+                height: 110,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      description,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: const Color(0xFF7B3738),
-                size: 20,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: 14, top: 45),
+              child: Icon(
+                Icons.arrow_forward,
+                color: Colors.brown,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,169 +1,231 @@
-// lib/screens/manager/manager_home_screen.dart
 import 'package:flutter/material.dart';
-import '../../models/restaurant.dart';
-import '../../widgets/restaurant_card.dart';
-import 'manager_restaurant_detail_screen.dart';
-import 'manager_add_restaurant_screen.dart';
-import 'manager_profile_screen.dart';
+import '../../routes/app_routes.dart';
 
 class ManagerHomeScreen extends StatelessWidget {
-  static const routeName = '/manager/home';
-
   const ManagerHomeScreen({super.key});
 
-  List<Restaurant> _dummyRestaurants() {
-    return [
-      Restaurant(
-        id: '1',
-        name: 'Abebe Restaurant',
-        location: 'Addis Ababa',
-        description: 'Local dishes and more.',
-        imageUrl:
-            'https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg',
-        managerName: 'Abebe',
-      ),
-      Restaurant(
-        id: '2',
-        name: 'Chala Restaurant',
-        location: 'Bole, Addis',
-        description: 'Dinner and drinks.',
-        imageUrl:
-            'https://images.pexels.com/photos/3731474/pexels-photo-3731474.jpeg',
-        managerName: 'Chala',
-      ),
-    ];
+  void _onRestaurantTap(BuildContext context, String id) {
+    Navigator.pushNamed(context, AppRoutes.managerRestaurantDetail, arguments: id);
+  }
+
+  void _onAddRestaurant(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.managerAddRestaurant);
+  }
+
+  void _onBottomNavTap(BuildContext context, int index) {
+    // 0 = home, 1 = profile
+    if (index == 1) {
+      Navigator.pushNamed(context, AppRoutes.managerProfile);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final restaurants = _dummyRestaurants();
+    const headerColor = Color(0xFF6F3738);
+    const cardColor = Color(0xFFE3D3C3);
+    const addButtonColor = Color(0xFF7F3335);
+    const bottomBarColor = Color(0xFFE3D3C3);
+
+    // Temporary mock data; later replace with model + Firebase.
+    final restaurants = [
+      _ManagerRestaurantItem(
+        id: '1',
+        name: 'Abebe Restaurant',
+        imageUrl:
+            'https://via.placeholder.com/150', // replace with AssetImage or NetworkImage
+      ),
+      _ManagerRestaurantItem(
+        id: '2',
+        name: 'Chala Restaurant',
+        imageUrl: 'https://via.placeholder.com/150',
+      ),
+    ];
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF72383D),
-        elevation: 0,
-        title: const Text('Enbla', style: TextStyle(color: Color(0xFFD9C3A5))),
-        centerTitle: false,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
+      body: Column(
+        children: [
+          // Header
+          Container(
+            color: headerColor,
+            padding:
+                const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 16),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Hello, Manger Get',
-                  style: TextStyle(color: Color(0xFFD9C3A5)),
-                ),
-                const SizedBox(width: 12),
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(
-                    context,
-                    ManagerProfileScreen.routeName,
+                  'Enbla',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
                   ),
-                  child: const CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.white,
-                    child: Text(
-                      'G',
+                ),
+                Row(
+                  children: [
+                    const Text(
+                      'Hello, Manger Get',
                       style: TextStyle(
-                        color: Color(0xFF4A2E2E),
-                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 8),
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        'G',
+                        style: TextStyle(
+                          color: headerColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFFE5D3C5),
-        selectedItemColor: const Color(0xFF4A2E2E),
-        unselectedItemColor: const Color(0xFF4A2E2E),
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.pushNamed(context, ManagerProfileScreen.routeName);
-          }
-        },
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            const Text(
-              'My Restaurants',
-              style: TextStyle(
-                color: Color(0xFF4A2E2E),
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: ListView.builder(
-                itemCount: restaurants.length,
-                itemBuilder: (context, index) {
-                  final restaurant = restaurants[index];
-                  return RestaurantCard(
-                    restaurant: restaurant,
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        ManagerRestaurantDetailScreen.routeName,
-                        arguments: restaurant,
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(28),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.35),
-                      blurRadius: 12,
-                      offset: const Offset(0, 8),
+
+          // Content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'My, Restaurants',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.black87,
                     ),
-                  ],
-                ),
-                child: ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7B3738),
-                    foregroundColor: const Color(0xFFD9C3A5),
-                    shape: const StadiumBorder(),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 20,
-                    ),
-                    elevation: 4,
                   ),
-                  onPressed: () {
-                    Navigator.pushNamed(
-                      context,
-                      ManagerAddRestaurantScreen.routeName,
-                    );
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Add Restaurants'),
-                ),
+                  const SizedBox(height: 16),
+
+                  // Restaurant list
+                  ...restaurants.map(
+                    (r) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: GestureDetector(
+                        onTap: () => _onRestaurantTap(context, r.id),
+                        child: Container(
+                          height: 96,
+                          decoration: BoxDecoration(
+                            color: cardColor,
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Row(
+                            children: [
+                              // Image
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(18),
+                                  bottomLeft: Radius.circular(18),
+                                ),
+                                child: Image.network(
+                                  r.imageUrl,
+                                  width: 110,
+                                  height: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+
+                              // Name
+                              Expanded(
+                                child: Text(
+                                  r.name,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+
+                              // Arrow
+                              const Padding(
+                                padding: EdgeInsets.only(right: 16),
+                                child: Icon(
+                                  Icons.arrow_forward,
+                                  color: Colors.brown,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Add Restaurants button
+                  Center(
+                    child: SizedBox(
+                      width: 220,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: addButtonColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          elevation: 8,
+                          shadowColor: Colors.black54,
+                        ),
+                        onPressed: () => _onAddRestaurant(context),
+                        icon: const Icon(Icons.add),
+                        label: const Text(
+                          'Add Restaurants',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-          ],
-        ),
+          ),
+        ],
+      ),
+
+      // Bottom navigation
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: bottomBarColor,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.black54,
+        currentIndex: 0,
+        onTap: (i) => _onBottomNavTap(context, i),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: '',
+          ),
+        ],
       ),
     );
   }
+}
+
+class _ManagerRestaurantItem {
+  final String id;
+  final String name;
+  final String imageUrl;
+
+  const _ManagerRestaurantItem({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
+  });
 }

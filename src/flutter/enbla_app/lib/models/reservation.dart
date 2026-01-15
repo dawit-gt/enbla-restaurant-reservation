@@ -1,18 +1,30 @@
-// lib/models/reservation.dart
+enum ReservationStatus {
+  requested,
+  confirmed,
+  rejected,
+  cancelled,
+}
+
 class Reservation {
   final String id;
   final String restaurantId;
-  final String userId;
+  final String restaurantName;
+  final String customerId;
+  final String customerName;
+  final String location;
   final DateTime dateTime;
-  final int guests;
-  final String status;
+  final int guestCount;
+  final ReservationStatus status;
 
-  Reservation({
+  const Reservation({
     required this.id,
     required this.restaurantId,
-    required this.userId,
+    required this.restaurantName,
+    required this.customerId,
+    required this.customerName,
+    required this.location,
     required this.dateTime,
-    required this.guests,
-    required this.status,
+    required this.guestCount,
+      required this.status,
   });
 }

@@ -1,11 +1,7 @@
-// lib/screens/auth/signup_screen.dart
 import 'package:flutter/material.dart';
-import '../../widgets/text_input_field.dart';
-import 'login_screen.dart';
+import '../../routes/app_routes.dart';
 
 class SignupScreen extends StatefulWidget {
-  static const routeName = '/signup';
-
   const SignupScreen({super.key});
 
   @override
@@ -16,214 +12,269 @@ class _SignupScreenState extends State<SignupScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  // TODO: connect to Firebase registration
-  void _signupAsCustomer() {
-    // TODO: register user as customer
+  void _onBack() {
     Navigator.pop(context);
   }
 
-  void _signupAsManager() {
-    // TODO: register user as manager
-    Navigator.pop(context);
+  void _onSignupAsCustomer() {
+    // TODO: implement customer signup & navigate
+    Navigator.pushNamed(context, AppRoutes.customerHome);
   }
 
-  Widget _stylishAction(String label, VoidCallback onPressed) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Colors.transparent,
-        border: Border.all(color: const Color(0xFF4E2021), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.35),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(28),
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 28),
-            child: Center(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  color: Color(0xFFD9C3A5),
-                  fontWeight: FontWeight.w600,
+  void _onSignupAsManager() {
+    // TODO: implement manager signup & navigate
+    Navigator.pushNamed(context, AppRoutes.managerHome);
+  }
+
+  void _onLogin() {
+    Navigator.pushNamed(context, AppRoutes.login);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const backgroundColor = Color(0xFF6F3738);
+    const cardColor = Color(0xFFE3D3C3);
+    const primaryButtonColor = Color(0xFF7F3335);
+    const buttonShadowColor = Colors.black54;
+
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Top row: back arrow + title
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Color(0xFFE9D9D0),
+                    ),
+                    onPressed: _onBack,
+                  ),
+                  const SizedBox(width: 4),
+                  const Text(
+                    'Signup',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFFE9D9D0),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Logo and welcome text
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFB43D3F),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.35),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.restaurant,
+                        color: Colors.white,
+                        size: 48,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Welcome to Enbla',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFE9D9D0),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
+
+              const SizedBox(height: 32),
+
+              // Name
+              _SignupTextField(
+                controller: _nameController,
+                hintText: 'Name',
+              ),
+              const SizedBox(height: 12),
+
+              // Email
+              _SignupTextField(
+                controller: _emailController,
+                hintText: 'Email',
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 12),
+
+              // Password
+              _SignupTextField(
+                controller: _passwordController,
+                hintText: 'Password',
+                obscureText: true,
+              ),
+              const SizedBox(height: 12),
+
+              // Confirm Password
+              _SignupTextField(
+                controller: _confirmPasswordController,
+                hintText: 'Confirm Password',
+                obscureText: true,
+              ),
+
+              const SizedBox(height: 28),
+
+              // Signup as Customer button
+              _SignupButton(
+                label: 'Signup as Customer',
+                onPressed: _onSignupAsCustomer,
+                color: primaryButtonColor,
+                shadowColor: buttonShadowColor,
+              ),
+              const SizedBox(height: 16),
+
+              // Signup as Manager button
+              _SignupButton(
+                label: 'Signup as Manager',
+                onPressed: _onSignupAsManager,
+                color: primaryButtonColor,
+                shadowColor: buttonShadowColor,
+              ),
+
+              const SizedBox(height: 28),
+
+              // Login text
+              GestureDetector(
+                onTap: _onLogin,
+                child: const Text.rich(
+                  TextSpan(
+                    text: 'Already have an account, ',
+                    style: TextStyle(
+                      color: Color(0xFFE9D9D0),
+                      fontSize: 14,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: 'Login',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                          color: Color(0xFFE9D9D0),
+                        ),
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+            ],
           ),
         ),
       ),
     );
   }
+}
+
+class _SignupTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final TextInputType? keyboardType;
+  final bool obscureText;
+
+  const _SignupTextField({
+    required this.controller,
+    required this.hintText,
+    this.keyboardType,
+    this.obscureText = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF72383D),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Top-left back icon and"Signup" title
-            Positioned(
-              left: 16,
-              top: 18,
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7B3738),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.35),
-                            blurRadius: 8,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back,
-                        color: Color(0xFFD9C3A5),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Signup',
-                    style: TextStyle(
-                      color: Color(0xFFD9C3A5),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    const cardColor = Color(0xFFE3D3C3);
 
-            SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 56),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 24),
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      style: const TextStyle(color: Colors.black87),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: cardColor,
+        hintText: hintText,
+        hintStyle: const TextStyle(color: Colors.black45),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide.none,
+        ),
+      ),
+    );
+  }
+}
 
-                      // logo
-                      Container(
-                        width: 96,
-                        height: 96,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF7B3738),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFF4E2021)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.35),
-                              blurRadius: 10,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Image.asset(
-                            'assets/images/enbla_logo.png',
-                            width: 64,
-                            height: 64,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(
-                                  Icons.restaurant,
-                                  size: 64,
-                                  color: Colors.white,
-                                ),
-                          ),
-                        ),
-                      ),
+class _SignupButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+  final Color color;
+  final Color shadowColor;
 
-                      const SizedBox(height: 18),
+  const _SignupButton({
+    required this.label,
+    required this.onPressed,
+    required this.color,
+    required this.shadowColor,
+  });
 
-                      const Text(
-                        'Welcome to Enbla',
-                        style: TextStyle(
-                          color: Color(0xFFD9C3A5),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      TextInputField(
-                        controller: _nameController,
-                        hintText: 'Name',
-                      ),
-                      const SizedBox(height: 12),
-                      TextInputField(
-                        controller: _emailController,
-                        hintText: 'Email',
-                      ),
-                      const SizedBox(height: 12),
-                      TextInputField(
-                        controller: _passwordController,
-                        hintText: 'Password',
-                        obscure: true,
-                      ),
-                      const SizedBox(height: 12),
-                      TextInputField(
-                        controller: _confirmController,
-                        hintText: 'Confirm Password',
-                        obscure: true,
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      _stylishAction('Signup as Customer', _signupAsCustomer),
-                      const SizedBox(height: 12),
-                      _stylishAction('Signup as Manager', _signupAsManager),
-
-                      const SizedBox(height: 24),
-
-                      TextButton(
-                        onPressed: () => Navigator.pushReplacementNamed(
-                          context,
-                          LoginScreen.routeName,
-                        ),
-                        child: const Text(
-                          'Already have an account, Login',
-                          style: TextStyle(color: Color(0xFFD9C3A5)),
-                        ),
-                      ),
-
-                      const SizedBox(height: 48),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 230,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          elevation: 8,
+          shadowColor: shadowColor,
+        ),
+        onPressed: onPressed,
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );

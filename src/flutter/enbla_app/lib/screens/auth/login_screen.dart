@@ -1,13 +1,7 @@
-// lib/screens/auth/login_screen.dart
 import 'package:flutter/material.dart';
-import '../../widgets/text_input_field.dart';
-import '../customer/customer_home_screen.dart';
-import '../manager/manager_home_screen.dart';
-import 'signup_screen.dart';
+import '../../routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const routeName = '/login';
-
   const LoginScreen({super.key});
 
   @override
@@ -18,14 +12,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  void _loginAsCustomer() {
-    Navigator.pushReplacementNamed(context, CustomerHomeScreen.routeName);
-  }
-
-  void _loginAsManager() {
-    Navigator.pushReplacementNamed(context, ManagerHomeScreen.routeName);
-  }
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -33,163 +19,214 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Widget _stylishAction(String label, VoidCallback onPressed) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        color: Colors.transparent,
-        border: Border.all(color: const Color(0xFF4E2021), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.35),
-            blurRadius: 10,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(28),
-          onTap: onPressed,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 28),
-            child: Center(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  color: Color(0xFFD9C3A5),
-                  fontWeight: FontWeight.w600,
+  void _onLoginAsCustomer() {
+    Navigator.pushNamed(context, AppRoutes.customerHome);
+  }
+
+  void _onLoginAsManager() {
+    Navigator.pushNamed(context, AppRoutes.managerHome);
+  }
+
+  void _onSignup() {
+    Navigator.pushNamed(context, AppRoutes.signup);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const backgroundColor = Color(0xFF6F3738);
+    const cardColor = Color(0xFFE3D3C3);
+    const primaryButtonColor = Color(0xFF7F3335);
+    const buttonShadowColor = Colors.black54;
+
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 16),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Login',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFE9D9D0),
+                  ),
                 ),
               ),
-            ),
+              const SizedBox(height: 40),
+
+              // Logo
+              Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFB43D3F),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.35),
+                            blurRadius: 18,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.restaurant,
+                        color: Colors.white,
+                        size: 48,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Welcome to Enbla',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFE9D9D0),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 40),
+
+              // Email field
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                style: const TextStyle(color: Colors.black87),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: cardColor,
+                  hintText: 'Email',
+                  hintStyle: const TextStyle(color: Colors.black45),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Password field
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                style: const TextStyle(color: Colors.black87),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: cardColor,
+                  hintText: 'Password',
+                  hintStyle: const TextStyle(color: Colors.black45),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 32),
+
+              // Login as Customer button
+              _LoginButton(
+                label: 'Login as Customer',
+                onPressed: _onLoginAsCustomer,
+                color: primaryButtonColor,
+                shadowColor: buttonShadowColor,
+              ),
+              const SizedBox(height: 16),
+
+              // Login as Manager button
+              _LoginButton(
+                label: 'Login as Manager',
+                onPressed: _onLoginAsManager,
+                color: primaryButtonColor,
+                shadowColor: buttonShadowColor,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Signup text
+              GestureDetector(
+                onTap: _onSignup,
+                child: const Text.rich(
+                  TextSpan(
+                    text: "Don't have an account, ",
+                    style: TextStyle(
+                      color: Color(0xFFE9D9D0),
+                      fontSize: 14,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: 'Signup',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          decoration: TextDecoration.underline,
+                          color: Color(0xFFE9D9D0),
+                        ),
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
+              const SizedBox(height: 24),
+            ],
           ),
         ),
       ),
     );
   }
+}
+
+class _LoginButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onPressed;
+  final Color color;
+  final Color shadowColor;
+
+  const _LoginButton({
+    required this.label,
+    required this.onPressed,
+    required this.color,
+    required this.shadowColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF72383D),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Top-left title
-            const Positioned(
-              left: 20,
-              top: 24,
-              child: Text(
-                'Login',
-                style: TextStyle(
-                  color: Color(0xFFD9C3A5),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            // Main content
-            SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 420),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 42),
-
-                      // logo box that matches figma's rounded square
-                      Container(
-                        width: 96,
-                        height: 96,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF7B3738),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFF4E2021)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.35),
-                              blurRadius: 10,
-                              offset: const Offset(0, 6),
-                            ),
-                            BoxShadow(
-                              color: Colors.white.withOpacity(0.02),
-                              offset: const Offset(0, -2),
-                              blurRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Image.asset(
-                            'assets/images/enbla_logo.png',
-                            width: 48,
-                            height: 48,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(
-                                  Icons.restaurant,
-                                  size: 44,
-                                  color: Colors.white,
-                                ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      const Text(
-                        'Welcome to Enbla',
-                        style: TextStyle(
-                          color: Color(0xFFD9C3A5),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      TextInputField(
-                        controller: _emailController,
-                        hintText: 'Email',
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      TextInputField(
-                        controller: _passwordController,
-                        hintText: 'Password',
-                        obscure: true,
-                      ),
-
-                      const SizedBox(height: 28),
-
-                      // Buttons with styled container to emulate Figma's shadowed rounded buttons
-                      _stylishAction('Login as Customer', _loginAsCustomer),
-
-                      const SizedBox(height: 12),
-
-                      _stylishAction('Login as Manager', _loginAsManager),
-
-                      const SizedBox(height: 28),
-
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushNamed(context, SignupScreen.routeName);
-                        },
-                        child: const Text(
-                          "Don't have an account, Signup",
-                          style: TextStyle(color: Color(0xFFD9C3A5)),
-                        ),
-                      ),
-
-                      const SizedBox(height: 48),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
+    return SizedBox(
+      width: 220,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          elevation: 8,
+          shadowColor: shadowColor,
+        ),
+        onPressed: onPressed,
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
