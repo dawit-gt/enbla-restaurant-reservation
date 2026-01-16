@@ -38,8 +38,12 @@ class ManagerProfileScreen extends StatelessWidget {
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 16),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 20,
+              right: 20,
+              bottom: 16,
+            ),
             child: const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -115,7 +119,9 @@ class ManagerProfileScreen extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: cardColor,
                       borderRadius: BorderRadius.circular(18),
@@ -123,16 +129,11 @@ class ManagerProfileScreen extends StatelessWidget {
                     child: RichText(
                       text: const TextSpan(
                         text: 'Email: ',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.black87, fontSize: 14),
                         children: [
                           TextSpan(
                             text: managerEmail,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -147,7 +148,9 @@ class ManagerProfileScreen extends StatelessWidget {
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 18),
+                        horizontal: 16,
+                        vertical: 18,
+                      ),
                       decoration: BoxDecoration(
                         color: cardColor,
                         borderRadius: BorderRadius.circular(18),
@@ -163,10 +166,7 @@ class ManagerProfileScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Colors.brown,
-                          ),
+                          Icon(Icons.arrow_forward, color: Colors.brown),
                         ],
                       ),
                     ),
@@ -191,9 +191,7 @@ class ManagerProfileScreen extends StatelessWidget {
                       onPressed: () => _onLogout(context),
                       child: const Text(
                         'Log out',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
@@ -212,14 +210,8 @@ class ManagerProfileScreen extends StatelessWidget {
         currentIndex: 1,
         onTap: (i) => _onBottomNavTap(context, i),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );

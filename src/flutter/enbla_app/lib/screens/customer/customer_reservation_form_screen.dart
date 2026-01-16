@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../services/reservation_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CustomerReservationFormScreen extends StatefulWidget {
   const CustomerReservationFormScreen({super.key});
@@ -28,8 +30,39 @@ class _CustomerReservationFormScreenState
     Navigator.pop(context);
   }
 
-  void _onReserve() {
-    // TODO: send reservation to backend (e.g. Firebase)
+  void _onReserve() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must be logged in to reserve.')),
+      );
+      return;
+    }
+    final restaurantId =
+        'restaurant_id'; // Replace with actual restaurant id if available
+    final reservationId = DateTime.now().millisecondsSinceEpoch.toString();
+    final guests = int.tryParse(_guestsController.text) ?? 1;
+    final date = _dateController.text;
+    final time = _timeController.text;
+    DateTime? dateTime;
+    try {
+      dateTime = DateTime.parse('${date.split('/').reversed.join('-')}T$time');
+    } catch (_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid date or time format.')),
+      );
+      return;
+    }
+    await ReservationService().addReservation(
+      reservationId: reservationId,
+      userId: user.uid,
+      restaurantId: restaurantId,
+      dateTime: dateTime,
+      guests: guests,
+    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Reservation successful!')));
     Navigator.pop(context);
   }
 
@@ -49,8 +82,12 @@ class _CustomerReservationFormScreenState
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 12, right: 20, bottom: 12),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 12,
+              right: 20,
+              bottom: 12,
+            ),
             child: Row(
               children: [
                 IconButton(
@@ -106,10 +143,7 @@ class _CustomerReservationFormScreenState
                 children: [
                   const Text(
                     'Reservation Form',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 24),
 
@@ -130,9 +164,7 @@ class _CustomerReservationFormScreenState
                             children: [
                               TextSpan(
                                 text: restaurantName,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.w700),
                               ),
                             ],
                           ),
@@ -208,9 +240,7 @@ class _CustomerReservationFormScreenState
                         onPressed: _onReserve,
                         child: const Text(
                           'Reserve',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -247,10 +277,7 @@ class _LabeledField extends StatelessWidget {
           width: 100,
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
         ),
         const SizedBox(width: 8),
@@ -283,8 +310,10 @@ class _RoundedTextField extends StatelessWidget {
         filled: true,
         fillColor: color,
         hintText: hintText,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide.none,
@@ -305,10 +334,7 @@ class _BulletDot extends StatelessWidget {
       width: 8,
       height: 8,
       margin: const EdgeInsets.only(top: 4),
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

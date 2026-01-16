@@ -5,12 +5,19 @@ class CustomerHomeScreen extends StatelessWidget {
   const CustomerHomeScreen({super.key});
 
   void _onRestaurantTap(BuildContext context, String id) {
-    Navigator.pushNamed(context, AppRoutes.customerRestaurantDetail, arguments: id);
+    Navigator.pushNamed(
+      context,
+      AppRoutes.customerRestaurantDetail,
+      arguments: id,
+    );
   }
 
-  void _onBottomNavTap(int index) {
+  void _onBottomNavTap(BuildContext context, int index) {
     // 0 = home, 1 = profile
-    // no BuildContext here; do nothing. Bottom nav wiring handled via callbacks where needed.
+    if (index == 1) {
+      Navigator.pushNamed(context, AppRoutes.customerProfile);
+    }
+    // index == 0 => already on home; do nothing
   }
 
   @override
@@ -25,35 +32,21 @@ class CustomerHomeScreen extends StatelessWidget {
         name: 'Abebe Restaurant',
         description:
             'A cozy modern restaurant serving freshly prepared local and international dishes. Known for its warm atmosphere and friendly service, ideal for evening meals and celebrations.',
-        imageUrl: 'https://via.placeholder.com/160',
+        imageUrl: 'assets/images/abebe.jpg',
       ),
       _CustomerRestaurant(
         id: '2',
         name: 'Chala Restaurant',
         description:
             'A contemporary dining spot blending grilled flavors with classic recipes. Perfect for relaxed conversations and memorable table reservations.',
-        imageUrl: 'https://via.placeholder.com/160',
+        imageUrl: 'assets/images/chala.jpg',
       ),
       _CustomerRestaurant(
         id: '3',
         name: 'Dawit Restaurant',
         description:
             'A stylish restaurant offering simple, flavorful meals made with fresh ingredients. Great for quick lunches and relaxed dinners.',
-        imageUrl: 'https://via.placeholder.com/160',
-      ),
-      _CustomerRestaurant(
-        id: '4',
-        name: 'Tadele Restaurant',
-        description:
-            'An elegant restaurant focused on quality and comfort. Popular for family dinners and special occasions.',
-        imageUrl: 'https://via.placeholder.com/160',
-      ),
-      _CustomerRestaurant(
-        id: '5',
-        name: 'Terefe Restaurant',
-        description:
-            'A casual dining restaurant featuring light meals and comforting flavors, with easy table booking.',
-        imageUrl: 'https://via.placeholder.com/160',
+        imageUrl: 'assets/images/dawit.jpg',
       ),
     ];
 
@@ -64,8 +57,12 @@ class CustomerHomeScreen extends StatelessWidget {
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 16),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 20,
+              right: 20,
+              bottom: 16,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -130,7 +127,7 @@ class CustomerHomeScreen extends StatelessWidget {
                                     topLeft: Radius.circular(18),
                                     bottomLeft: Radius.circular(18),
                                   ),
-                                  child: Image.network(
+                                  child: Image.asset(
                                     r.imageUrl,
                                     width: 120,
                                     height: 110,
@@ -142,8 +139,9 @@ class CustomerHomeScreen extends StatelessWidget {
                                 // Text
                                 Expanded(
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -173,7 +171,10 @@ class CustomerHomeScreen extends StatelessWidget {
                                 // Arrow
                                 const Padding(
                                   padding: EdgeInsets.only(
-                                      right: 14, top: 45, bottom: 0),
+                                    right: 14,
+                                    top: 45,
+                                    bottom: 0,
+                                  ),
                                   child: Icon(
                                     Icons.arrow_forward,
                                     color: Colors.brown,
@@ -198,16 +199,10 @@ class CustomerHomeScreen extends StatelessWidget {
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black54,
         currentIndex: 0,
-        onTap: _onBottomNavTap,
+        onTap: (i) => _onBottomNavTap(context, i),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );

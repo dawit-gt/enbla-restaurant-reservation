@@ -33,8 +33,12 @@ class ManagerRestaurantDetailScreen extends StatelessWidget {
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 12, right: 20, bottom: 12),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 12,
+              right: 20,
+              bottom: 12,
+            ),
             child: Row(
               children: [
                 IconButton(
@@ -97,10 +101,7 @@ class ManagerRestaurantDetailScreen extends StatelessWidget {
           SizedBox(
             height: 190,
             width: double.infinity,
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-            ),
+            child: Image.network(imageUrl, fit: BoxFit.cover),
           ),
 
           // Details
@@ -124,10 +125,7 @@ class ManagerRestaurantDetailScreen extends StatelessWidget {
                     isBoldValue: true,
                   ),
                   const SizedBox(height: 12),
-                  _BulletParagraph(
-                    bulletColor: bulletColor,
-                    text: description,
-                  ),
+                  _BulletParagraph(bulletColor: bulletColor, text: description),
                   const SizedBox(height: 12),
                   _BulletTextRow(
                     bulletColor: bulletColor,
@@ -155,9 +153,7 @@ class ManagerRestaurantDetailScreen extends StatelessWidget {
                         onPressed: () => _onUpdate(context),
                         child: const Text(
                           'Update',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -205,12 +201,7 @@ class _BulletTextRow extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 fontSize: 14,
               ),
-              children: [
-                TextSpan(
-                  text: value,
-                  style: valueStyle,
-                ),
-              ],
+              children: [TextSpan(text: value, style: valueStyle)],
             ),
           ),
         ),
@@ -223,10 +214,7 @@ class _BulletParagraph extends StatelessWidget {
   final Color bulletColor;
   final String text;
 
-  const _BulletParagraph({
-    required this.bulletColor,
-    required this.text,
-  });
+  const _BulletParagraph({required this.bulletColor, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -238,10 +226,7 @@ class _BulletParagraph extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              color: Colors.black87,
-              fontSize: 14,
-            ),
+            style: const TextStyle(color: Colors.black87, fontSize: 14),
           ),
         ),
       ],
@@ -260,10 +245,7 @@ class _BulletDot extends StatelessWidget {
       width: 8,
       height: 8,
       margin: const EdgeInsets.only(top: 5),
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

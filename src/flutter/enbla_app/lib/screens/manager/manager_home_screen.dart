@@ -5,7 +5,11 @@ class ManagerHomeScreen extends StatelessWidget {
   const ManagerHomeScreen({super.key});
 
   void _onRestaurantTap(BuildContext context, String id) {
-    Navigator.pushNamed(context, AppRoutes.managerRestaurantDetail, arguments: id);
+    Navigator.pushNamed(
+      context,
+      AppRoutes.managerRestaurantDetail,
+      arguments: id,
+    );
   }
 
   void _onAddRestaurant(BuildContext context) {
@@ -48,8 +52,12 @@ class ManagerHomeScreen extends StatelessWidget {
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 16),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 20,
+              right: 20,
+              bottom: 16,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -182,9 +190,7 @@ class ManagerHomeScreen extends StatelessWidget {
                         icon: const Icon(Icons.add),
                         label: const Text(
                           'Add Restaurants',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -204,14 +210,8 @@ class ManagerHomeScreen extends StatelessWidget {
         currentIndex: 0,
         onTap: (i) => _onBottomNavTap(context, i),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );

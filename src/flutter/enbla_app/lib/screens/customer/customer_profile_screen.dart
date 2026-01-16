@@ -13,9 +13,12 @@ class CustomerProfileScreen extends StatelessWidget {
     Navigator.pushNamedAndRemoveUntil(context, AppRoutes.login, (_) => false);
   }
 
-  void _onBottomNavTap(int index) {
-    // 0 = home, 1 = profile; handle navigation later
-    // left intentionally blank
+  void _onBottomNavTap(BuildContext context, int index) {
+    // 0 = home, 1 = profile
+    if (index == 0) {
+      Navigator.pushNamed(context, AppRoutes.customerHome);
+    }
+    // index == 1 => already on profile; do nothing
   }
 
   @override
@@ -36,8 +39,12 @@ class CustomerProfileScreen extends StatelessWidget {
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 16),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 20,
+              right: 20,
+              bottom: 16,
+            ),
             child: const Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -113,7 +120,9 @@ class CustomerProfileScreen extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     decoration: BoxDecoration(
                       color: cardColor,
                       borderRadius: BorderRadius.circular(18),
@@ -121,16 +130,11 @@ class CustomerProfileScreen extends StatelessWidget {
                     child: RichText(
                       text: const TextSpan(
                         text: 'Email: ',
-                        style: TextStyle(
-                          color: Colors.black87,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.black87, fontSize: 14),
                         children: [
                           TextSpan(
                             text: customerEmail,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -145,7 +149,9 @@ class CustomerProfileScreen extends StatelessWidget {
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 18),
+                        horizontal: 16,
+                        vertical: 18,
+                      ),
                       decoration: BoxDecoration(
                         color: cardColor,
                         borderRadius: BorderRadius.circular(18),
@@ -161,10 +167,7 @@ class CustomerProfileScreen extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Icon(
-                            Icons.arrow_forward,
-                            color: Colors.brown,
-                          ),
+                          Icon(Icons.arrow_forward, color: Colors.brown),
                         ],
                       ),
                     ),
@@ -189,9 +192,7 @@ class CustomerProfileScreen extends StatelessWidget {
                       onPressed: () => _onLogout(context),
                       child: const Text(
                         'Log out',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
@@ -208,16 +209,10 @@ class CustomerProfileScreen extends StatelessWidget {
         selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black54,
         currentIndex: 1,
-        onTap: _onBottomNavTap,
+        onTap: (i) => _onBottomNavTap(context, i),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
         ],
       ),
     );

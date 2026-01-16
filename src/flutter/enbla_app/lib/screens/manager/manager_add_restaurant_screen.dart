@@ -1,3 +1,8 @@
+import '../../services/firestore_service.dart';
+import '../../services/supabase_storage_service.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ManagerAddRestaurantScreen extends StatefulWidget {
@@ -10,30 +15,73 @@ class ManagerAddRestaurantScreen extends StatefulWidget {
 
 class _ManagerAddRestaurantScreenState
     extends State<ManagerAddRestaurantScreen> {
-  final _nameController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _managerController = TextEditingController();
+  File? _selectedPhoto;
+  String? _uploadedPhotoUrl;
+  final nameController = TextEditingController();
+  final locationController = TextEditingController();
+  final descriptionController = TextEditingController();
+  final managerController = TextEditingController();
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _locationController.dispose();
-    _descriptionController.dispose();
-    _managerController.dispose();
+    nameController.dispose();
+    locationController.dispose();
+    descriptionController.dispose();
+    managerController.dispose();
     super.dispose();
   }
 
-  void _onBack() {
+  void onBack() {
     Navigator.pop(context);
   }
 
-  void _onUploadPhoto() {
-    // TODO: open image picker
+  Future<void> onUploadPhoto() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+    if (picked != null) {
+      setState(() {
+        _selectedPhoto = File(picked.path);
+      });
+    }
   }
 
-  void _onAdd() {
-    // TODO: validate & send to backend (e.g. Firebase)
+  void onAdd() async {
+    final name = nameController.text.trim();
+    final location = locationController.text.trim();
+    final description = descriptionController.text.trim();
+    final managerId = FirebaseAuth.instance.currentUser?.uid;
+    if (name.isEmpty || location.isEmpty || managerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Name, location, and manager are required.'),
+        ),
+      );
+      return;
+    }
+    final restaurantId = DateTime.now().millisecondsSinceEpoch.toString();
+    String? photoUrl;
+    if (_selectedPhoto != null) {
+      photoUrl = await SupabaseStorageService().uploadRestaurantPhoto(
+        _selectedPhoto!,
+        restaurantId,
+      );
+      setState(() {
+        _uploadedPhotoUrl = photoUrl;
+      });
+    }
+    await FirestoreService().addRestaurant(
+      restaurantId: restaurantId,
+      name: name,
+      location: location,
+      managerId: managerId,
+      extraFields: {
+        'description': description,
+        if (photoUrl != null) 'photoUrl': photoUrl,
+      },
+    );
     Navigator.pop(context);
   }
 
@@ -50,13 +98,17 @@ class _ManagerAddRestaurantScreenState
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 12, right: 20, bottom: 12),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 12,
+              right: 20,
+              bottom: 12,
+            ),
             child: Row(
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: _onBack,
+                  onPressed: onBack,
                 ),
                 const SizedBox(width: 4),
                 const Expanded(
@@ -109,12 +161,24 @@ class _ManagerAddRestaurantScreenState
                   _BulletRow(
                     bulletColor: bulletColor,
                     label: 'Upload photo:',
-                    trailing: IconButton(
-                      icon: const Icon(
-                        Icons.upload,
-                        color: Colors.black,
-                      ),
-                      onPressed: _onUploadPhoto,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (_selectedPhoto != null)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Image.file(
+                              _selectedPhoto!,
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        IconButton(
+                          icon: const Icon(Icons.upload, color: Colors.black),
+                          onPressed: onUploadPhoto,
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -124,7 +188,7 @@ class _ManagerAddRestaurantScreenState
                     bulletColor: bulletColor,
                     label: 'Name:',
                     child: _RoundedTextField(
-                      controller: _nameController,
+                      controller: nameController,
                       color: fieldColor,
                     ),
                   ),
@@ -135,7 +199,7 @@ class _ManagerAddRestaurantScreenState
                     bulletColor: bulletColor,
                     label: 'Location:',
                     child: _RoundedTextField(
-                      controller: _locationController,
+                      controller: locationController,
                       color: fieldColor,
                     ),
                   ),
@@ -146,7 +210,7 @@ class _ManagerAddRestaurantScreenState
                     bulletColor: bulletColor,
                     label: 'Description:',
                     child: _RoundedTextField(
-                      controller: _descriptionController,
+                      controller: descriptionController,
                       color: fieldColor,
                       maxLines: 4,
                     ),
@@ -158,7 +222,7 @@ class _ManagerAddRestaurantScreenState
                     bulletColor: bulletColor,
                     label: 'Manger:',
                     child: _RoundedTextField(
-                      controller: _managerController,
+                      controller: managerController,
                       color: fieldColor,
                     ),
                   ),
@@ -180,12 +244,10 @@ class _ManagerAddRestaurantScreenState
                           elevation: 6,
                           shadowColor: Colors.black45,
                         ),
-                        onPressed: _onAdd,
+                        onPressed: onAdd,
                         child: const Text(
                           'Add',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -219,10 +281,7 @@ class _BulletRow extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-          ),
+          style: const TextStyle(fontSize: 14, color: Colors.black87),
         ),
         const SizedBox(width: 8),
         if (trailing != null) trailing!,
@@ -253,10 +312,7 @@ class _LabeledField extends StatelessWidget {
           width: 80,
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
         ),
         const SizedBox(width: 8),
@@ -286,8 +342,10 @@ class _RoundedTextField extends StatelessWidget {
       decoration: InputDecoration(
         filled: true,
         fillColor: color,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide.none,
@@ -308,10 +366,7 @@ class _BulletDot extends StatelessWidget {
       width: 8,
       height: 8,
       margin: const EdgeInsets.only(top: 6),
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

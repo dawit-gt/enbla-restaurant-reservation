@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
+import '../../services/google_sign_in_service.dart';
+import '../../services/auth_service.dart';
+import '../../services/firestore_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -9,6 +13,19 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  Future<void> _signInWithGoogle() async {
+    try {
+      final cred = await GoogleSignInService.signInWithGoogle(forSignUp: true);
+      if (cred != null) {
+        Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Google sign-in failed')));
+    }
+  }
+
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -27,24 +44,69 @@ class _SignupScreenState extends State<SignupScreen> {
     Navigator.pop(context);
   }
 
-  void _onSignupAsCustomer() {
-    // TODO: implement customer signup & navigate
-    Navigator.pushNamed(context, AppRoutes.customerHome);
+  Future<void> _onSignupAsCustomer() async {
+    await _performSignup(asManager: false);
   }
 
-  void _onSignupAsManager() {
-    // TODO: implement manager signup & navigate
-    Navigator.pushNamed(context, AppRoutes.managerHome);
+  Future<void> _onSignupAsManager() async {
+    await _performSignup(asManager: true);
   }
 
   void _onLogin() {
     Navigator.pushNamed(context, AppRoutes.login);
   }
 
+  Future<void> _performSignup({required bool asManager}) async {
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    if (password != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
+      return;
+    }
+    try {
+      final cred = await AuthService().signUpWithEmail(
+        name: name,
+        email: email,
+        password: password,
+      );
+      final uid = cred.user?.uid;
+      if (uid != null) {
+        if (asManager) {
+          await FirestoreService().addManager(
+            uid: uid,
+            name: name,
+            email: email,
+          );
+        } else {
+          await FirestoreService().addCustomer(
+            uid: uid,
+            name: name,
+            email: email,
+          );
+        }
+      }
+      if (asManager) {
+        Navigator.pushReplacementNamed(context, AppRoutes.managerHome);
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
+      }
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Signup failed')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     const backgroundColor = Color(0xFF6F3738);
-    const cardColor = Color(0xFFE3D3C3);
     const primaryButtonColor = Color(0xFF7F3335);
     const buttonShadowColor = Colors.black54;
 
@@ -119,10 +181,7 @@ class _SignupScreenState extends State<SignupScreen> {
               const SizedBox(height: 32),
 
               // Name
-              _SignupTextField(
-                controller: _nameController,
-                hintText: 'Name',
-              ),
+              _SignupTextField(controller: _nameController, hintText: 'Name'),
               const SizedBox(height: 12),
 
               // Email
@@ -150,6 +209,25 @@ class _SignupScreenState extends State<SignupScreen> {
 
               const SizedBox(height: 28),
 
+              // Google Sign-In
+              SizedBox(
+                width: 240,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.g_mobiledata, size: 20),
+                  label: const Text('Sign up with Google'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black87,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: _signInWithGoogle,
+                ),
+              ),
+              const SizedBox(height: 16),
+
               // Signup as Customer button
               _SignupButton(
                 label: 'Signup as Customer',
@@ -175,10 +253,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: const Text.rich(
                   TextSpan(
                     text: 'Already have an account, ',
-                    style: TextStyle(
-                      color: Color(0xFFE9D9D0),
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Color(0xFFE9D9D0), fontSize: 14),
                     children: [
                       TextSpan(
                         text: 'Login',
@@ -230,8 +305,10 @@ class _SignupTextField extends StatelessWidget {
         fillColor: cardColor,
         hintText: hintText,
         hintStyle: const TextStyle(color: Colors.black45),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
@@ -270,12 +347,7 @@ class _SignupButton extends StatelessWidget {
           shadowColor: shadowColor,
         ),
         onPressed: onPressed,
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
       ),
     );
   }

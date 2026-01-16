@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../routes/app_routes.dart';
+import '../../services/auth_service.dart';
+import '../../services/google_sign_in_service.dart';
+import '../../services/firestore_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,16 +23,59 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onLoginAsCustomer() {
-    Navigator.pushNamed(context, AppRoutes.customerHome);
-  }
-
-  void _onLoginAsManager() {
-    Navigator.pushNamed(context, AppRoutes.managerHome);
-  }
-
   void _onSignup() {
     Navigator.pushNamed(context, AppRoutes.signup);
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _loginAsCustomer() async {
+    try {
+      await AuthService().signInWithEmail(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
+    } on FirebaseAuthException catch (e) {
+      _showError(e.message ?? 'Login failed');
+    } catch (e) {
+      _showError('Login failed');
+    }
+  }
+
+  Future<void> _loginAsManager() async {
+    try {
+      await AuthService().signInWithEmail(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+      Navigator.pushReplacementNamed(context, AppRoutes.managerHome);
+    } on FirebaseAuthException catch (e) {
+      _showError(e.message ?? 'Login failed');
+    } catch (e) {
+      _showError('Login failed');
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      final cred = await GoogleSignInService.signInWithGoogle(forSignUp: false);
+      if (cred != null) {
+        // Optionally, you can check if user exists in Firestore and add if new
+        await FirestoreService().addCustomer(
+          uid: cred.user!.uid,
+          name: cred.user!.displayName ?? '',
+          email: cred.user!.email ?? '',
+        );
+        Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
+      }
+    } catch (e) {
+      _showError('Google sign-in failed');
+    }
   }
 
   @override
@@ -109,8 +156,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   fillColor: cardColor,
                   hintText: 'Email',
                   hintStyle: const TextStyle(color: Colors.black45),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -129,8 +178,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   fillColor: cardColor,
                   hintText: 'Password',
                   hintStyle: const TextStyle(color: Colors.black45),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(30),
                     borderSide: BorderSide.none,
@@ -143,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Login as Customer button
               _LoginButton(
                 label: 'Login as Customer',
-                onPressed: _onLoginAsCustomer,
+                onPressed: _loginAsCustomer,
                 color: primaryButtonColor,
                 shadowColor: buttonShadowColor,
               ),
@@ -152,12 +203,31 @@ class _LoginScreenState extends State<LoginScreen> {
               // Login as Manager button
               _LoginButton(
                 label: 'Login as Manager',
-                onPressed: _onLoginAsManager,
+                onPressed: _loginAsManager,
                 color: primaryButtonColor,
                 shadowColor: buttonShadowColor,
               ),
 
               const SizedBox(height: 32),
+
+              // Google Sign-In
+              SizedBox(
+                width: 240,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.g_mobiledata, size: 20),
+                  label: const Text('Sign in with Google'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black87,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: _signInWithGoogle,
+                ),
+              ),
+              const SizedBox(height: 16),
 
               // Signup text
               GestureDetector(
@@ -165,10 +235,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: const Text.rich(
                   TextSpan(
                     text: "Don't have an account, ",
-                    style: TextStyle(
-                      color: Color(0xFFE9D9D0),
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Color(0xFFE9D9D0), fontSize: 14),
                     children: [
                       TextSpan(
                         text: 'Signup',
@@ -222,12 +289,7 @@ class _LoginButton extends StatelessWidget {
           shadowColor: shadowColor,
         ),
         onPressed: onPressed,
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
       ),
     );
   }

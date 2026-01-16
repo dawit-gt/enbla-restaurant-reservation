@@ -12,7 +12,20 @@
           "package_name": "com.example.enbla_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "129062883500-9rcd9ph422npk8j6iisnqsuq7v436880.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.enbla_app",
+            "certificate_hash": "a073053db424830afb1f76d492677ec227e522e9"
+          }
+        },
+        {
+          "client_id": "129062883500-ji16pk5etsl21aq7bp15gvrjbd1au8d7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCZI8FDqGA7SphwnWnh2EUAbCQ2YY8LPUs"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "129062883500-ji16pk5etsl21aq7bp15gvrjbd1au8d7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "129062883500-k14m40uj4nf189aeinub2gdntuqqbdgf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.enblaApp"
+              }
+            }
+          ]
         }
       }
     }
