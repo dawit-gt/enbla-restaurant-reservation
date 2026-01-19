@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CustomerReservationsScreen extends StatelessWidget {
   const CustomerReservationsScreen({super.key});
@@ -7,8 +9,30 @@ class CustomerReservationsScreen extends StatelessWidget {
     Navigator.pop(context);
   }
 
-  void _onCancel(String id) {
-    // TODO: cancel reservation in backend
+  Future<void> _onCancel(BuildContext context, String id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel Reservation'),
+        content: const Text(
+          'Are you sure you want to cancel this reservation?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    await FirebaseFirestore.instance.collection('reservations').doc(id).update({
+      'status': 'canceled',
+    });
   }
 
   @override
@@ -18,25 +42,8 @@ class CustomerReservationsScreen extends StatelessWidget {
     const bulletColor = Color(0xFF7F3335);
     const buttonColor = Color(0xFF7F3335);
 
-    final reservations = [
-      _CustomerReservation(
-        id: '1',
-        restaurantName: 'Abebe Restaurant',
-        location: 'Lafto',
-        date: '12/12/12',
-        time: '11:30 AM',
-        status: 'Confirmed',
-      ),
-      _CustomerReservation(
-        id: '2',
-        restaurantName: 'Chala Restaurant',
-        location: 'Lebu',
-        date: '12/12/12',
-        time: '11:30 AM',
-        status: 'Requested',
-      ),
-    ];
-
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final customerId = currentUser?.uid;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -44,8 +51,12 @@ class CustomerReservationsScreen extends StatelessWidget {
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 12, right: 20, bottom: 12),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 12,
+              right: 20,
+              bottom: 12,
+            ),
             child: Row(
               children: [
                 IconButton(
@@ -62,29 +73,14 @@ class CustomerReservationsScreen extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                Row(
-                  children: const [
-                    Text(
-                      'Hello, Dawit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        'D',
-                        style: TextStyle(
-                          color: headerColor,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
+                // TODO: Replace with live customer info if needed
+                const Text(
+                  'Hello, Customer',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -92,17 +88,28 @@ class CustomerReservationsScreen extends StatelessWidget {
 
           // List
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              child: Column(
-                children: reservations
-                    .map(
-                      (r) => Padding(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('reservations')
+                  .where('userId', isEqualTo: customerId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final docs = snapshot.data?.docs ?? [];
+                return SingleChildScrollView(
+                  child: Column(
+                    children: docs.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                           decoration: BoxDecoration(
                             color: cardColor,
                             borderRadius: BorderRadius.circular(18),
@@ -113,32 +120,35 @@ class CustomerReservationsScreen extends StatelessWidget {
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Restaurant',
-                                value: r.restaurantName,
+                                value: data['restaurantName'] ?? '',
                               ),
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Location',
-                                value: r.location,
+                                value: data['location'] ?? '',
                               ),
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Date',
-                                value: r.date,
+                                value: data['date'] ?? '',
                               ),
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Time',
-                                value: r.time,
+                                value: data['time'] ?? '',
                               ),
-
-                              // Status line
+                              _ReservationBulletRow(
+                                bulletColor: bulletColor,
+                                label: 'Guests',
+                                value: (data['guests']?.toString() ?? ''),
+                              ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _BulletDot(color: bulletColor),
                                   const SizedBox(width: 8),
                                   Text(
-                                    r.status,
+                                    data['status'] ?? 'requested',
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,
@@ -147,41 +157,47 @@ class CustomerReservationsScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 12),
-
-                              Center(
-                                child: SizedBox(
-                                  width: 140,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: buttonColor,
-                                      foregroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
+                              if ((data['status'] ?? 'requested') !=
+                                      'canceled' &&
+                                  (data['status'] ?? 'requested') != 'rejected')
+                                Center(
+                                  child: SizedBox(
+                                    width: 140,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: buttonColor,
+                                        foregroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            30,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                        ),
+                                        elevation: 6,
+                                        shadowColor: Colors.black45,
                                       ),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 10),
-                                      elevation: 6,
-                                      shadowColor: Colors.black45,
-                                    ),
-                                    onPressed: () => _onCancel(r.id),
-                                    child: const Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
+                                      onPressed: () =>
+                                          _onCancel(context, doc.id),
+                                      child: const Text(
+                                        'Cancel',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
-              ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -230,16 +246,11 @@ class _ReservationBulletRow extends StatelessWidget {
           child: RichText(
             text: TextSpan(
               text: '$label: ',
-              style: const TextStyle(
-                color: Colors.black87,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.black87, fontSize: 14),
               children: [
                 TextSpan(
                   text: value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -261,10 +272,7 @@ class _BulletDot extends StatelessWidget {
       width: 8,
       height: 8,
       margin: const EdgeInsets.only(top: 5),
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

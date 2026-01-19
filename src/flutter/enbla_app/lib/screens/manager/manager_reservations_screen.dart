@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ManagerReservationsScreen extends StatelessWidget {
   const ManagerReservationsScreen({super.key});
@@ -7,12 +9,56 @@ class ManagerReservationsScreen extends StatelessWidget {
     Navigator.pop(context);
   }
 
-  void _onAccept(String id) {
-    // TODO: update reservation status to accepted in backend
+  Future<void> _onAccept(BuildContext context, String id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Accept Reservation'),
+        content: const Text(
+          'Are you sure you want to accept this reservation?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    await FirebaseFirestore.instance.collection('reservations').doc(id).update({
+      'status': 'confirmed',
+    });
   }
 
-  void _onReject(String id) {
-    // TODO: update reservation status to rejected in backend
+  Future<void> _onReject(BuildContext context, String id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reject Reservation'),
+        content: const Text(
+          'Are you sure you want to reject this reservation?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    await FirebaseFirestore.instance.collection('reservations').doc(id).update({
+      'status': 'rejected',
+    });
   }
 
   @override
@@ -22,27 +68,8 @@ class ManagerReservationsScreen extends StatelessWidget {
     const bulletColor = Color(0xFF7F3335);
     const buttonColor = Color(0xFF7F3335);
 
-    final reservations = [
-      _ManagerReservation(
-        id: '1',
-        restaurantName: 'Abebe Restaurant',
-        customerName: 'Dawit Tadele',
-        location: 'Lafto',
-        date: '12/12/12',
-        time: '11:30 AM',
-        guests: 5,
-      ),
-      _ManagerReservation(
-        id: '2',
-        restaurantName: 'Chala Restaurant',
-        customerName: 'Dawit Tadele',
-        location: 'Lebu',
-        date: '12/12/12',
-        time: '11:30 AM',
-        guests: 5,
-      ),
-    ];
-
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final managerId = currentUser?.uid;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -50,8 +77,12 @@ class ManagerReservationsScreen extends StatelessWidget {
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 12, right: 20, bottom: 12),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 12,
+              right: 20,
+              bottom: 12,
+            ),
             child: Row(
               children: [
                 IconButton(
@@ -68,29 +99,14 @@ class ManagerReservationsScreen extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                Row(
-                  children: const [
-                    Text(
-                      'Hello, Dawit',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        'D',
-                        style: TextStyle(
-                          color: headerColor,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
+                // TODO: Replace with live manager info if needed
+                const Text(
+                  'Hello, Manager',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
@@ -98,17 +114,28 @@ class ManagerReservationsScreen extends StatelessWidget {
 
           // List
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              child: Column(
-                children: reservations
-                    .map(
-                      (r) => Padding(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('reservations')
+                  .where('managerId', isEqualTo: managerId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final docs = snapshot.data?.docs ?? [];
+                return SingleChildScrollView(
+                  child: Column(
+                    children: docs.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Container(
                           width: double.infinity,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
                           decoration: BoxDecoration(
                             color: cardColor,
                             borderRadius: BorderRadius.circular(18),
@@ -119,56 +146,69 @@ class ManagerReservationsScreen extends StatelessWidget {
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Restaurant',
-                                value: r.restaurantName,
+                                value: data['restaurantName'] ?? '',
                               ),
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Name',
-                                value: r.customerName,
+                                value: data['customerName'] ?? '',
                               ),
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Location',
-                                value: r.location,
+                                value: data['location'] ?? '',
                               ),
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Date',
-                                value: r.date,
+                                value: data['date'] ?? '',
                               ),
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'Time',
-                                value: r.time,
+                                value: data['time'] ?? '',
                               ),
                               _ReservationBulletRow(
                                 bulletColor: bulletColor,
                                 label: 'No of guests',
-                                value: r.guests.toString(),
+                                value: (data['guests'] ?? '').toString(),
+                              ),
+                              _ReservationBulletRow(
+                                bulletColor: bulletColor,
+                                label: 'Status',
+                                value: data['status'] ?? 'requested',
                               ),
                               const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  _ActionButton(
-                                    label: 'Accept',
-                                    color: buttonColor,
-                                    onPressed: () => _onAccept(r.id),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  _ActionButton(
-                                    label: 'Reject',
-                                    color: buttonColor,
-                                    onPressed: () => _onReject(r.id),
-                                  ),
-                                ],
-                              ),
+                              if ((data['status'] ?? 'requested') !=
+                                      'canceled' &&
+                                  (data['status'] ?? 'requested') !=
+                                      'confirmed' &&
+                                  (data['status'] ?? 'requested') != 'rejected')
+                                Row(
+                                  children: [
+                                    _ActionButton(
+                                      label: 'Accept',
+                                      color: buttonColor,
+                                      onPressed: () =>
+                                          _onAccept(context, doc.id),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    _ActionButton(
+                                      label: 'Reject',
+                                      color: buttonColor,
+                                      onPressed: () =>
+                                          _onReject(context, doc.id),
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
                         ),
-                      ),
-                    )
-                    .toList(),
-              ),
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -219,16 +259,11 @@ class _ReservationBulletRow extends StatelessWidget {
           child: RichText(
             text: TextSpan(
               text: '$label: ',
-              style: const TextStyle(
-                color: Colors.black87,
-                fontSize: 14,
-              ),
+              style: const TextStyle(color: Colors.black87, fontSize: 14),
               children: [
                 TextSpan(
                   text: value,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
               ],
             ),
@@ -250,10 +285,7 @@ class _BulletDot extends StatelessWidget {
       width: 8,
       height: 8,
       margin: const EdgeInsets.only(top: 5),
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }
@@ -284,12 +316,7 @@ class _ActionButton extends StatelessWidget {
           shadowColor: Colors.black45,
         ),
         onPressed: onPressed,
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
       ),
     );
   }

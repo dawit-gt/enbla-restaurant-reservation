@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import '../../services/supabase_storage_service.dart';
 
 class ManagerEditRestaurantScreen extends StatefulWidget {
   const ManagerEditRestaurantScreen({super.key});
@@ -10,20 +14,47 @@ class ManagerEditRestaurantScreen extends StatefulWidget {
 
 class _ManagerEditRestaurantScreenState
     extends State<ManagerEditRestaurantScreen> {
-  final _nameController = TextEditingController(text: 'Abebe Restaurant');
-  final _locationController = TextEditingController(text: 'Lafto, Addis Ababa');
-  final _descriptionController = TextEditingController(
-    text:
-        'A cozy modern restaurant serving freshly prepared local and international dishes.',
-  );
-  final _managerController = TextEditingController(text: 'Abebe Tola');
+  final _nameController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  String? _restaurantId;
+  String? _photoUrl;
+  File? _selectedPhoto;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(_fetchRestaurant);
+  }
+
+  Future<void> _fetchRestaurant() async {
+    // Get restaurantId from arguments
+    final args = ModalRoute.of(context)?.settings.arguments;
+    if (args is String) {
+      _restaurantId = args;
+      final doc = await FirebaseFirestore.instance
+          .collection('restaurants')
+          .doc(_restaurantId)
+          .get();
+      final data = doc.data();
+      if (data != null) {
+        _nameController.text = data['name'] ?? '';
+        _locationController.text = data['location'] ?? '';
+        _descriptionController.text = data['description'] ?? '';
+        _photoUrl = data['photoUrl'] as String?;
+      }
+    }
+    setState(() {
+      _loading = false;
+    });
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _locationController.dispose();
     _descriptionController.dispose();
-    _managerController.dispose();
     super.dispose();
   }
 
@@ -32,12 +63,85 @@ class _ManagerEditRestaurantScreenState
   }
 
   void _onUploadPhoto() {
-    // TODO: open image picker (gallery / camera)
+    final picker = ImagePicker();
+    picker.pickImage(source: ImageSource.gallery, imageQuality: 80).then((
+      picked,
+    ) {
+      if (picked != null) {
+        setState(() {
+          _selectedPhoto = File(picked.path);
+        });
+      }
+    });
   }
 
-  void _onUpdate() {
-    // TODO: validate & save to backend (e.g. Firebase)
-    Navigator.pop(context);
+  void _onUpdate() async {
+    if (_restaurantId == null) {
+      print('No restaurantId provided.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: No restaurant ID found.')),
+      );
+      return;
+    }
+    setState(() {
+      _loading = true;
+    });
+    final name = _nameController.text.trim();
+    final location = _locationController.text.trim();
+    final description = _descriptionController.text.trim();
+    String? photoUrl = _photoUrl;
+    try {
+      if (_selectedPhoto != null) {
+        print('Uploading image to Supabase...');
+        photoUrl = await SupabaseStorageService().uploadRestaurantPhoto(
+          _selectedPhoto!,
+          _restaurantId!,
+        );
+        print('Supabase upload result: $photoUrl');
+        if (photoUrl == null) {
+          setState(() {
+            _loading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Photo upload failed! Check your Supabase Storage policy, bucket name, and permissions.',
+              ),
+            ),
+          );
+          return;
+        }
+      }
+      print('Updating Firestore restaurant...');
+      await FirebaseFirestore.instance
+          .collection('restaurants')
+          .doc(_restaurantId)
+          .update({
+            'name': name,
+            'location': location,
+            'description': description,
+            if (photoUrl != null) 'photoUrl': photoUrl,
+          });
+      print('Firestore update complete.');
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Restaurant updated successfully!')),
+        );
+      }
+    } catch (e) {
+      print('Update error: $e');
+      setState(() {
+        _loading = false;
+      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Update failed: $e')));
+    }
+    print('Update button logic finished.');
   }
 
   @override
@@ -46,6 +150,9 @@ class _ManagerEditRestaurantScreenState
     const fieldColor = Color(0xFFE3D3C3);
     const bulletColor = Color(0xFF7F3335);
 
+    if (_loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -53,8 +160,12 @@ class _ManagerEditRestaurantScreenState
           // Header
           Container(
             color: headerColor,
-            padding:
-                const EdgeInsets.only(top: 40, left: 12, right: 20, bottom: 12),
+            padding: const EdgeInsets.only(
+              top: 40,
+              left: 12,
+              right: 20,
+              bottom: 12,
+            ),
             child: Row(
               children: [
                 IconButton(
@@ -62,52 +173,23 @@ class _ManagerEditRestaurantScreenState
                   onPressed: _onBack,
                 ),
                 const SizedBox(width: 4),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Abebe',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Text(
-                        'Restaurant',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
+                const Expanded(
+                  child: Text(
+                    'Edit\nRestaurant',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-                Row(
-                  children: const [
-                    Text(
-                      'Hello, Manager Get',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        'G',
-                        style: TextStyle(
-                          color: headerColor,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
+                const Text(
+                  'Hello, Manager',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
             ),
@@ -136,10 +218,7 @@ class _ManagerEditRestaurantScreenState
                     bulletColor: bulletColor,
                     label: 'Upload photo:',
                     trailing: IconButton(
-                      icon: const Icon(
-                        Icons.upload,
-                        color: Colors.black,
-                      ),
+                      icon: const Icon(Icons.upload, color: Colors.black),
                       onPressed: _onUploadPhoto,
                     ),
                   ),
@@ -177,18 +256,6 @@ class _ManagerEditRestaurantScreenState
                       maxLines: 4,
                     ),
                   ),
-                  const SizedBox(height: 12),
-
-                  // Manager field
-                  _LabeledField(
-                    bulletColor: bulletColor,
-                    label: 'Manger:',
-                    child: _RoundedTextField(
-                      controller: _managerController,
-                      color: fieldColor,
-                    ),
-                  ),
-
                   const SizedBox(height: 40),
 
                   // Update button
@@ -209,9 +276,7 @@ class _ManagerEditRestaurantScreenState
                         onPressed: _onUpdate,
                         child: const Text(
                           'Update',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -245,10 +310,7 @@ class _BulletRow extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black87,
-          ),
+          style: const TextStyle(fontSize: 14, color: Colors.black87),
         ),
         const SizedBox(width: 8),
         if (trailing != null) trailing!,
@@ -279,10 +341,7 @@ class _LabeledField extends StatelessWidget {
           width: 80,
           child: Text(
             label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black87),
           ),
         ),
         const SizedBox(width: 8),
@@ -312,8 +371,10 @@ class _RoundedTextField extends StatelessWidget {
       decoration: InputDecoration(
         filled: true,
         fillColor: color,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(18),
           borderSide: BorderSide.none,
@@ -334,10 +395,7 @@ class _BulletDot extends StatelessWidget {
       width: 8,
       height: 8,
       margin: const EdgeInsets.only(top: 6),
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

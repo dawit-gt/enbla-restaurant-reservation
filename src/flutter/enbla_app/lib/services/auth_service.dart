@@ -1,13 +1,40 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  Future<void> supabaseSignUpWithEmail(String email, String password) async {
+    final response = await Supabase.instance.client.auth.signUp(
+      email: email,
+      password: password,
+    );
+    if (response.user == null) {
+      final errorMsg = response.session == null
+          ? 'No session'
+          : 'Unknown error';
+      throw Exception('Supabase signup failed: $errorMsg');
+    }
+  }
+
+  Future<void> supabaseSignInWithEmail(String email, String password) async {
+    final response = await Supabase.instance.client.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+    if (response.user == null) {
+      final errorMsg = response.session == null
+          ? 'No session'
+          : 'Unknown error';
+      throw Exception('Supabase login failed: $errorMsg');
+    }
+  }
+
+  final fb_auth.FirebaseAuth _auth = fb_auth.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<fb_auth.User?> get authStateChanges => _auth.authStateChanges();
 
-  Future<UserCredential> signUpWithEmail({
+  Future<fb_auth.UserCredential> signUpWithEmail({
     required String name,
     required String email,
     required String password,
@@ -20,7 +47,7 @@ class AuthService {
     return cred;
   }
 
-  Future<UserCredential> signInWithEmail({
+  Future<fb_auth.UserCredential> signInWithEmail({
     required String email,
     required String password,
   }) async {
@@ -30,11 +57,11 @@ class AuthService {
     );
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<fb_auth.UserCredential?> signInWithGoogle() async {
     final GoogleSignInAccount? account = await _googleSignIn.signIn();
     if (account == null) return null;
     final GoogleSignInAuthentication googleAuth = await account.authentication;
-    final credential = GoogleAuthProvider.credential(
+    final credential = fb_auth.GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );

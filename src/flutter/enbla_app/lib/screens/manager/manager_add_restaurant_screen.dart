@@ -20,14 +20,12 @@ class _ManagerAddRestaurantScreenState
   final nameController = TextEditingController();
   final locationController = TextEditingController();
   final descriptionController = TextEditingController();
-  final managerController = TextEditingController();
 
   @override
   void dispose() {
     nameController.dispose();
     locationController.dispose();
     descriptionController.dispose();
-    managerController.dispose();
     super.dispose();
   }
 
@@ -48,36 +46,60 @@ class _ManagerAddRestaurantScreenState
     }
   }
 
-  void onAdd() async {
+  Future<void> onAdd() async {
     final name = nameController.text.trim();
     final location = locationController.text.trim();
     final description = descriptionController.text.trim();
-    final managerId = FirebaseAuth.instance.currentUser?.uid;
-    if (name.isEmpty || location.isEmpty || managerId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Name, location, and manager are required.'),
-        ),
-      );
-      return;
-    }
+    final user = FirebaseAuth.instance.currentUser;
+    final managerId = user?.uid ?? '';
+    final managerName = user?.displayName ?? user?.email ?? '';
     final restaurantId = DateTime.now().millisecondsSinceEpoch.toString();
     String? photoUrl;
+
+    // Validate required fields
+    if (name.isEmpty || location.isEmpty || description.isEmpty) {
+      String missing = '';
+      if (name.isEmpty) missing += 'Name, ';
+      if (location.isEmpty) missing += 'Location, ';
+      if (description.isEmpty) missing += 'Description, ';
+      if (missing.endsWith(', ')) {
+        missing = missing.substring(0, missing.length - 2);
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Please fill in: $missing')));
+      return;
+    }
+
     if (_selectedPhoto != null) {
       photoUrl = await SupabaseStorageService().uploadRestaurantPhoto(
         _selectedPhoto!,
         restaurantId,
       );
+      print('Uploaded photoUrl: $photoUrl');
       setState(() {
         _uploadedPhotoUrl = photoUrl;
       });
+      if (photoUrl == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Photo upload failed! Check your Supabase Storage policy, bucket name, and permissions.',
+            ),
+          ),
+        );
+        // Optionally, return here to avoid adding a restaurant without a photo
+        // return;
+      }
     }
+
     await FirestoreService().addRestaurant(
       restaurantId: restaurantId,
       name: name,
       location: location,
       managerId: managerId,
       extraFields: {
+        'managerName': managerName,
         'description': description,
         if (photoUrl != null) 'photoUrl': photoUrl,
       },
@@ -91,6 +113,7 @@ class _ManagerAddRestaurantScreenState
     const fieldColor = Color(0xFFE3D3C3);
     const bulletColor = Color(0xFF7F3335);
 
+    // Remove managerId field from UI if present
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
@@ -125,23 +148,11 @@ class _ManagerAddRestaurantScreenState
                 Row(
                   children: const [
                     Text(
-                      'Hello, Manger Get',
+                      'Hello, Manager',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.white,
-                      child: Text(
-                        'G',
-                        style: TextStyle(
-                          color: headerColor,
-                          fontWeight: FontWeight.w700,
-                        ),
                       ),
                     ),
                   ],
@@ -217,16 +228,7 @@ class _ManagerAddRestaurantScreenState
                   ),
                   const SizedBox(height: 14),
 
-                  // Manager
-                  _LabeledField(
-                    bulletColor: bulletColor,
-                    label: 'Manger:',
-                    child: _RoundedTextField(
-                      controller: managerController,
-                      color: fieldColor,
-                    ),
-                  ),
-
+                  // Removed manager field
                   const SizedBox(height: 48),
 
                   // Add button

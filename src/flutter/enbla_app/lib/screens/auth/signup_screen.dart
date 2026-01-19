@@ -17,7 +17,43 @@ class _SignupScreenState extends State<SignupScreen> {
     try {
       final cred = await GoogleSignInService.signInWithGoogle(forSignUp: true);
       if (cred != null) {
-        Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
+        final user = cred.user;
+        if (user == null) return;
+        final name = user.displayName ?? '';
+        final email = user.email ?? '';
+        // Show role selection dialog
+        final role = await showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Select Role'),
+            content: const Text('Please choose your role:'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop('customer'),
+                child: const Text('Customer'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop('manager'),
+                child: const Text('Manager'),
+              ),
+            ],
+          ),
+        );
+        if (role == 'manager') {
+          await FirestoreService().addManager(
+            uid: user.uid,
+            name: name,
+            email: email,
+          );
+          Navigator.pushReplacementNamed(context, AppRoutes.managerHome);
+        } else if (role == 'customer') {
+          await FirestoreService().addCustomer(
+            uid: user.uid,
+            name: name,
+            email: email,
+          );
+          Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
+        }
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -67,11 +103,14 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
     try {
+      // Register in Firebase Auth
       final cred = await AuthService().signUpWithEmail(
         name: name,
         email: email,
         password: password,
       );
+      // Register in Supabase Auth
+      await AuthService().supabaseSignUpWithEmail(email, password);
       final uid = cred.user?.uid;
       if (uid != null) {
         if (asManager) {
@@ -94,10 +133,12 @@ class _SignupScreenState extends State<SignupScreen> {
         Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
       }
     } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException: \\${e.message}');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(e.message ?? 'Signup failed')));
     } catch (e) {
+      print('Signup error: $e');
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Signup failed')));
@@ -145,24 +186,12 @@ class _SignupScreenState extends State<SignupScreen> {
               Center(
                 child: Column(
                   children: [
-                    Container(
+                    SizedBox(
                       width: 100,
                       height: 100,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFB43D3F),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.35),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.restaurant,
-                        color: Colors.white,
-                        size: 48,
+                      child: Image.asset(
+                        'assets/images/enbla_logo.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -171,6 +200,15 @@ class _SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        color: Color(0xFFE9D9D0),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'አብረን እንብላ',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                         color: Color(0xFFE9D9D0),
                       ),
                     ),
@@ -209,6 +247,24 @@ class _SignupScreenState extends State<SignupScreen> {
 
               const SizedBox(height: 28),
 
+              // Signup as Customer button
+              _SignupButton(
+                label: 'Signup as Customer',
+                onPressed: _onSignupAsCustomer,
+                color: primaryButtonColor,
+                shadowColor: buttonShadowColor,
+              ),
+              const SizedBox(height: 16),
+
+              // Signup as Manager button
+              _SignupButton(
+                label: 'Signup as Manager',
+                onPressed: _onSignupAsManager,
+                color: primaryButtonColor,
+                shadowColor: buttonShadowColor,
+              ),
+              const SizedBox(height: 16),
+
               // Google Sign-In
               SizedBox(
                 width: 240,
@@ -226,25 +282,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: _signInWithGoogle,
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Signup as Customer button
-              _SignupButton(
-                label: 'Signup as Customer',
-                onPressed: _onSignupAsCustomer,
-                color: primaryButtonColor,
-                shadowColor: buttonShadowColor,
-              ),
-              const SizedBox(height: 16),
-
-              // Signup as Manager button
-              _SignupButton(
-                label: 'Signup as Manager',
-                onPressed: _onSignupAsManager,
-                color: primaryButtonColor,
-                shadowColor: buttonShadowColor,
-              ),
-
               const SizedBox(height: 28),
 
               // Login text

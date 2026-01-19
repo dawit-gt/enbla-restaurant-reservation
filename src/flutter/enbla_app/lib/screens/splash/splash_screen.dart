@@ -1,7 +1,5 @@
 // lib/screens/splash/splash_screen.dart
-import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,23 +12,23 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Wait 2 seconds then go to login
-    Timer(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        print('SplashScreen: navigating to /login');
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print('SplashScreen: build called');
     return Scaffold(
       backgroundColor: const Color(0xFF6F3738),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ... your existing logo widget ...
             Container(
               width: 120,
               height: 120,
@@ -45,10 +43,12 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.restaurant,
-                color: Colors.white,
-                size: 56,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: Image.asset(
+                  'assets/images/enbla_logo.png',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             const SizedBox(height: 32),
@@ -59,6 +59,16 @@ class _SplashScreenState extends State<SplashScreen> {
                 fontWeight: FontWeight.w700,
                 color: Color(0xFFE9D9D0),
                 letterSpacing: 1.2,
+              ),
+            ),
+            SizedBox(height: 16),
+            const Text(
+              'ኑ አብረን እንብላ',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFFE9D9D0),
+                letterSpacing: 1.1,
               ),
             ),
           ],

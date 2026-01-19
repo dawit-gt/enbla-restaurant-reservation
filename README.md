@@ -1,16 +1,17 @@
-# Enbla – Restaurant Reservation App
+# Enbla Restaurant Reservation
 
-## Description
-Enbla is a mobile application that allows users to browse restaurants and reserve tables by selecting date, time, and number of guests.
+This project is a cross-platform restaurant reservation app built with Flutter. It allows users to browse restaurants, make reservations, and manage bookings. The repository contains source code, design assets, documentation, and platform-specific files for Android, iOS, web, and desktop.
 
-## Technologies
-- Flutter (Dart)
-- Firebase Authentication
-- Cloud Firestore
+## Structure
 
-## User Roles
-- Restaurant Customer
-- Restaurant Manager
+- `design/`: UI/UX design resources
+- `docs/`: Project documentation
+- `src/`: Source code and platform files
 
-## Project Status
-In development
+## Getting Started
+
+See `src/flutter/enbla_app/README.md` for setup instructions.
+
+## License
+
+MIT License

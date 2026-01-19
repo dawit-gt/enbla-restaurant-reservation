@@ -35,28 +35,72 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _loginAsCustomer() async {
     try {
-      await AuthService().signInWithEmail(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+      final cred = await AuthService().signInWithEmail(
+        email: email,
+        password: password,
       );
+      // Also sign in to Supabase Auth
+      await AuthService().supabaseSignInWithEmail(email, password);
+      final uid = cred.user?.uid;
+      if (uid == null) {
+        _showError('Login failed');
+        return;
+      }
+      // Check if user exists in customers collection
+      final customerDoc = await FirestoreService().db
+          .collection('customers')
+          .doc(uid)
+          .get();
+      if (!customerDoc.exists) {
+        // User is not registered as customer
+        await AuthService().signOut();
+        _showError('You are not registered as a customer.');
+        return;
+      }
       Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
     } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException: \\${e.message}');
       _showError(e.message ?? 'Login failed');
     } catch (e) {
+      print('Login error: $e');
       _showError('Login failed');
     }
   }
 
   Future<void> _loginAsManager() async {
     try {
-      await AuthService().signInWithEmail(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+      final cred = await AuthService().signInWithEmail(
+        email: email,
+        password: password,
       );
+      // Also sign in to Supabase Auth
+      await AuthService().supabaseSignInWithEmail(email, password);
+      final uid = cred.user?.uid;
+      if (uid == null) {
+        _showError('Login failed');
+        return;
+      }
+      // Check if user exists in managers collection
+      final managerDoc = await FirestoreService().db
+          .collection('managers')
+          .doc(uid)
+          .get();
+      if (!managerDoc.exists) {
+        // User is not registered as manager
+        await AuthService().signOut();
+        _showError('You are not registered as a manager.');
+        return;
+      }
       Navigator.pushReplacementNamed(context, AppRoutes.managerHome);
     } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException: \\${e.message}');
       _showError(e.message ?? 'Login failed');
     } catch (e) {
+      print('Login error: $e');
       _showError('Login failed');
     }
   }
@@ -65,13 +109,43 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final cred = await GoogleSignInService.signInWithGoogle(forSignUp: false);
       if (cred != null) {
-        // Optionally, you can check if user exists in Firestore and add if new
-        await FirestoreService().addCustomer(
-          uid: cred.user!.uid,
-          name: cred.user!.displayName ?? '',
-          email: cred.user!.email ?? '',
+        final user = cred.user;
+        if (user == null) return;
+        final name = user.displayName ?? '';
+        final email = user.email ?? '';
+        // Show role selection dialog
+        final role = await showDialog<String>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Select Role'),
+            content: const Text('Please choose your role:'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop('customer'),
+                child: const Text('Customer'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop('manager'),
+                child: const Text('Manager'),
+              ),
+            ],
+          ),
         );
-        Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
+        if (role == 'manager') {
+          await FirestoreService().addManager(
+            uid: user.uid,
+            name: name,
+            email: email,
+          );
+          Navigator.pushReplacementNamed(context, AppRoutes.managerHome);
+        } else if (role == 'customer') {
+          await FirestoreService().addCustomer(
+            uid: user.uid,
+            name: name,
+            email: email,
+          );
+          Navigator.pushReplacementNamed(context, AppRoutes.customerHome);
+        }
       }
     } catch (e) {
       _showError('Google sign-in failed');
@@ -111,24 +185,12 @@ class _LoginScreenState extends State<LoginScreen> {
               Center(
                 child: Column(
                   children: [
-                    Container(
+                    SizedBox(
                       width: 100,
                       height: 100,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFB43D3F),
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.35),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.restaurant,
-                        color: Colors.white,
-                        size: 48,
+                      child: Image.asset(
+                        'assets/images/enbla_logo.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -137,6 +199,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        color: Color(0xFFE9D9D0),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'አብረን እንብላ',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                         color: Color(0xFFE9D9D0),
                       ),
                     ),

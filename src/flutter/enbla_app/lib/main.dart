@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'firebase_options.dart';
 
@@ -9,7 +8,6 @@ import 'routes/app_routes.dart';
 import 'theme/app_theme.dart';
 
 // Screens
-import 'screens/splash/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
 
@@ -28,11 +26,15 @@ import 'screens/customer/customer_reservations_screen.dart';
 import 'screens/customer/customer_restaurant_detail_screen.dart';
 import 'screens/customer/customer_reservation_form_screen.dart';
 
+// Splash
+import 'screens/splash/splash_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(
-    url: 'https://pumfflmbvbmweuvkcssi.supabase.co',
-    anonKey: 'sb_publishable_cm-Da9IhDXfpr_wTakM8Xw_UuENFfX-',
+    url: 'https://ifenzgestzrabemjqdum.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmZW56Z2VzdHpyYWJlbWpxZHVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg1Nzc2MjAsImV4cCI6MjA4NDE1MzYyMH0.cxpLb_6NIQWgTEI-OuoeT-1CNXxCYv566JN7ag7oNE8',
   );
   // Print unhandled Flutter errors to console
   FlutterError.onError = (details) {
@@ -52,8 +54,9 @@ class EnblaApp extends StatelessWidget {
       future: _initFirebase(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
-            home: Scaffold(body: Center(child: CircularProgressIndicator())),
+          // Show simple splash screen (no navigation) while initializing
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
           );
         }
 
@@ -61,120 +64,61 @@ class EnblaApp extends StatelessWidget {
           final error = snapshot.error.toString();
           // ignore: avoid_print
           print('Firebase.initializeApp() error: $error');
-
-          if (kIsWeb && error.contains('FirebaseOptions cannot be null')) {
-            return MaterialApp(
-              home: Scaffold(
-                appBar: AppBar(
-                  title: const Text('Firebase configuration required'),
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          'Firebase Web configuration is missing.',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          'The app is running on web but no Firebase options were provided.',
-                        ),
-                        SizedBox(height: 8),
-                        Text('Fix options (choose one):'),
-                        SizedBox(height: 8),
-                        Text(
-                          '1) Run the FlutterFire CLI to generate firebase_options.dart:',
-                        ),
-                        Text('   dart pub global activate flutterfire_cli'),
-                        Text(
-                          '   flutterfire configure --project <your-project-id>',
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '2) Or register a Web app in the Firebase Console and add a Firebase configuration.',
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          '3) As a temporary workaround you can initialize Firebase with explicit',
-                        ),
-                        Text('   FirebaseOptions (see Firebase docs).'),
-                        SizedBox(height: 12),
-                        Text(
-                          'After configuring, add the generated firebase_options.dart to lib/ and ',
-                        ),
-                        Text('restart the app.'),
-                      ],
+          return MaterialApp(
+            initialRoute: '/error',
+            routes: {
+              '/error': (context) => Scaffold(
+                body: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Text(
+                      'Initialization error:\n$error',
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
               ),
-            );
-          }
-
-          return MaterialApp(
-            home: Scaffold(
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Text(
-                    'Initialization error:\n$error',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
+            },
+            debugShowCheckedModeBanner: false,
           );
         }
 
+        // Firebase initialized, show splash then navigate to login
+        print(
+          'EnblaApp: Firebase initialized, building MaterialApp with SplashScreen',
+        );
         return MaterialApp(
           title: 'Enbla',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          home: StreamBuilder<fb_auth.User?>(
-            stream: fb_auth.FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SplashScreen();
-              }
-              if (snapshot.hasData) {
-                return const CustomerHomeScreen();
-              }
-              return const LoginScreen();
-            },
-          ),
+          initialRoute: '/',
           routes: {
             // Core
-            AppRoutes.login: (context) => const LoginScreen(),
-            AppRoutes.signup: (context) => const SignupScreen(),
+            '/': (context) => SplashScreen(),
+            AppRoutes.login: (context) => LoginScreen(),
+            AppRoutes.signup: (context) => SignupScreen(),
 
             // Manager
-            AppRoutes.managerHome: (context) => const ManagerHomeScreen(),
-            AppRoutes.managerProfile: (context) => const ManagerProfileScreen(),
+            AppRoutes.managerHome: (context) => ManagerHomeScreen(),
+            AppRoutes.managerProfile: (context) => ManagerProfileScreen(),
             AppRoutes.managerReservations: (context) =>
-                const ManagerReservationsScreen(),
+                ManagerReservationsScreen(),
             AppRoutes.managerRestaurantDetail: (context) =>
-                const ManagerRestaurantDetailScreen(),
+                ManagerRestaurantDetailScreen(),
             AppRoutes.managerAddRestaurant: (context) =>
-                const ManagerAddRestaurantScreen(),
+                ManagerAddRestaurantScreen(),
             AppRoutes.managerEditRestaurant: (context) =>
-                const ManagerEditRestaurantScreen(),
+                ManagerEditRestaurantScreen(),
 
             // Customer
-            AppRoutes.customerHome: (context) => const CustomerHomeScreen(),
-            AppRoutes.customerProfile: (context) =>
-                const CustomerProfileScreen(),
+            AppRoutes.customerHome: (context) => CustomerHomeScreen(),
+            AppRoutes.customerProfile: (context) => CustomerProfileScreen(),
             AppRoutes.customerReservations: (context) =>
-                const CustomerReservationsScreen(),
+                CustomerReservationsScreen(),
             AppRoutes.customerRestaurantDetail: (context) =>
-                const CustomerRestaurantDetailScreen(),
+                CustomerRestaurantDetailScreen(),
             AppRoutes.customerReservationForm: (context) =>
-                const CustomerReservationFormScreen(),
+                CustomerReservationFormScreen(),
           },
         );
       },
